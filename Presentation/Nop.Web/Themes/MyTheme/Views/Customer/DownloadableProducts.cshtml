@@ -1,0 +1,108 @@
+﻿@model CustomerDownloadableProductsModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Partial("MyAccountNavigation", Model.NavigationModel, new ViewDataDictionary())
+}
+
+
+@section  bread{
+    <div class="breadcrumbs">
+        <a href="@Url.RouteUrl("CustomerInfo")" >@T("Account.MyAccount") </a>
+        &nbsp;&gt;&nbsp; @T("Account.DownloadableProducts")
+    </div>
+}
+
+
+<div class="order-list">
+    <table class="down-table">
+        <colgroup>
+            <col class="c1">
+            <col class="c2">
+        </colgroup>
+        <thead>
+            <tr class="col-name">
+                <th>
+                   @T("Account.DownloadableProducts")
+                </th>
+                <th>@T("DownloadableProducts.Fields.Download")</th>
+            </tr>
+        </thead>
+
+        @if (Model.Items.Count > 0)
+        {
+
+            for (int i = 0; i < Model.Items.Count; i++)
+            {
+                var item = Model.Items[i];
+                    
+            <tbody>
+                <tr class="order-hd">
+                    <td colspan="2">
+                        <i class="icon-te"></i>
+                        <span class="num">@T("DownloadableProducts.Fields.Order")：
+                            <a href="@Url.RouteUrl("OrderDetails", new { orderId = item.OrderId })" target="_blank">@item.OrderId</a>
+                            <em class="type">&nbsp;&nbsp;</em>
+                        </span>
+                        <span class="time">@T("Account.CustomerOrders.OrderDate")：@item.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</span>
+                    </td>
+                </tr>
+                <tr @(i % 2 == 0 ? Html.Raw(" class=\"order-bd odd\"") : Html.Raw(" class=\"order-bd even\""))>
+
+                    <td class="goods">
+                        <a class="goods-pic" href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank">
+                            <img src="@item.PictureUrl"  alt="@item.ProductName"></a>
+                        <div class="goods-info">
+                            <a class="goods-name" href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank">@item.ProductName</a>
+                            <div class="goods-attr">
+                                @Html.Raw(item.ProductAttributes)
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="a-center download">
+                        @if (item.DownloadId > 0)
+                        {
+                            <div>
+                                <a href="@Url.RouteUrl("GetDownload", new { orderItemId = item.OrderItemGuid })">@T("DownloadableProducts.Fields.Download")</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                @T("DownloadableProducts.Fields.Download.NA")
+                            </div>
+                        }
+                        @if (item.LicenseId > 0)
+                        {
+                            <div>
+                                <a href="@Url.RouteUrl("GetLicense", new { orderItemId = item.OrderItemGuid })">@T("DownloadableProducts.Fields.DownloadLicense")</a>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            </tbody>
+            }
+        }
+        else
+        {
+            <tbody>
+                <tr class="order-empty">
+                    <td colspan="2">
+                        @T("DownloadableProducts.NoItems")
+                    </td>
+                </tr>
+
+            </tbody>
+        }
+    </table>
+</div>
+
+
+

@@ -1,0 +1,61 @@
+﻿@using Nop.Core
+@using Nop.Core.Infrastructure;
+@{
+    var displayMiniProfiler = CommonHelper.GetTrustLevel() >= AspNetHostingPermissionLevel.High &&
+        EngineContext.Current.Resolve<Nop.Core.Domain.StoreInformationSettings>().DisplayMiniProfilerInPublicStore;
+
+    //Customer Scripts
+
+
+    //resources
+  
+    Html.AppendScriptParts("~/Scripts/jquery.validate.unobtrusive.min.js");
+    Html.AppendScriptParts("~/Scripts/jquery.validate.min.js");
+    Html.AppendScriptParts("~/Scripts/jquery.unobtrusive-ajax.min.js");
+    Html.AppendScriptParts("~/Scripts/jquery-placeholder.js");
+    Html.AppendScriptParts("~/Scripts/jquery-1.10.2.min.js");
+
+
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/login.css");
+}
+<!DOCTYPE html>
+<html @Html.Partial("LanguageAttributes")>
+<head>
+    <title>@Html.NopTitle(true)</title>
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+    <meta name="description" content="@(Html.NopMetaDescription())" />
+    <meta name="keywords" content="@(Html.NopMetaKeywords())" />
+    <meta name="generator" content="nopCommerce" />
+    @*This is used so that themes can inject content into the header*@
+
+    @Html.NopCssFiles(this.Url, ResourceLocation.Head)
+    @Html.NopScripts(this.Url, ResourceLocation.Head)
+    @Html.NopCanonicalUrls()
+
+    @*Favicon - upload favicon.ico file to the root directory*@
+    @Html.Action("Favicon", "Common")
+    @if (displayMiniProfiler)
+    {
+        @StackExchange.Profiling.MiniProfiler.RenderIncludes();
+    }
+
+    <!--IE6背景图透明配置-->
+    <!--[if IE 6]>
+    <script type="text/javascript" src="~/Themes/MyTheme/DD_belatedPNG.js" ></script>
+    <script type="text/javascript">   
+        DD_belatedPNG.fix('.png_bg');
+    </script>
+    <![endif]-->
+    <!--[if lt IE 9]>
+    <script src="~/Themes/MyTheme/Scripts/html5shiv.js"></script>
+    <![endif]-->
+
+</head>
+<body class="login-bd">
+    <div class="login-wrap">
+        @RenderBody()
+    </div>
+    @Html.NopCssFiles(this.Url, ResourceLocation.Foot)
+    @Html.NopScripts(this.Url, ResourceLocation.Foot)
+</body>
+</html>

@@ -1,0 +1,236 @@
+﻿@model FoxNetSoft.Plugin.Misc.SimpleCheckout.Models.SimpleCheckoutModel
+@using System.Globalization
+@using System.Text
+@using Nop.Core
+@using Nop.Web.Framework.UI
+@using Nop.Web.Framework
+@using FoxNetSoft.Plugin.Misc.SimpleCheckout.Models
+<tr style="display:none">
+            <td>
+            </td>
+            <td>
+                    @Html.HiddenFor(model => model.ShippingAddress.Id)   
+            </td>
+</tr>
+@if (Model.AllowToSelectTheAddress && Model.ExistingShippingAddresses.Count() > 1)
+{
+    <tr>
+        <td>
+            @Html.NopLabelFor(model => model.ExistingShippingAddresses):
+        </td>
+        <td>
+                <select name="existingshippingaddresses" id="existingshippingaddresses" onchange="changeShippingAddress(this.value)" autocomplete="off">
+@foreach (var address in Model.ExistingShippingAddresses)
+{
+    var addressLine = "";
+    addressLine += address.FirstName;
+    addressLine += " " + address.LastName;
+    if (address.StreetAddressEnabled && !String.IsNullOrEmpty(address.Address1))
+    {
+        addressLine += ", " + address.Address1;
+    }
+    if (address.CityEnabled && !String.IsNullOrEmpty(address.City))
+    {
+        addressLine += ", " + address.City;
+    }
+    if (address.StateProvinceEnabled && !String.IsNullOrEmpty(address.StateProvinceName))
+    {
+        addressLine += ", " + address.StateProvinceName;
+    }
+    if (address.ZipPostalCodeEnabled && !String.IsNullOrEmpty(address.ZipPostalCode))
+    {
+        addressLine += " " + address.ZipPostalCode;
+    }
+    if (address.CountryEnabled && !String.IsNullOrWhiteSpace(address.CountryName))
+    {
+        addressLine += ", " + address.CountryName;
+    }
+    <option value="@(address.Id)">@(addressLine)</option>
+                }
+            </select>
+            </td>
+    </tr>
+}
+<tr>
+    <td>
+        @Html.NopLabelFor(model => model.ShippingAddress.FirstName):
+		@Html.RequiredHint()
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.ShippingAddress.FirstName, new {autocomplete = "off"})
+        <div>@Html.ValidationMessageFor(model => model.ShippingAddress.FirstName)</div>
+    </td>
+</tr>
+<tr>
+    <td>
+        @Html.NopLabelFor(model => model.ShippingAddress.LastName):
+		@Html.RequiredHint()
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.ShippingAddress.LastName, new {autocomplete = "off"})
+        <div>@Html.ValidationMessageFor(model => model.ShippingAddress.LastName)</div>
+    </td>
+</tr>
+@if (Model.ShippingAddress.PhoneEnabled)
+{
+    <tr>
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.PhoneNumber):
+            @if (Model.ShippingAddress.PhoneRequired)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.PhoneNumber, new {autocomplete = "off"})
+            <div>@Html.ValidationMessageFor(model => model.ShippingAddress.PhoneNumber)</div>
+        </td>
+    </tr>
+}
+@if (Model.ShippingAddress.FaxEnabled)
+{
+    <tr>
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.FaxNumber):
+            @if (Model.ShippingAddress.FaxRequired)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.FaxNumber, new {autocomplete = "off"})
+            <div>@Html.ValidationMessageFor(model => model.ShippingAddress.FaxNumber)</div>
+        </td>
+    </tr>
+}
+<tr>
+    <td>
+        @Html.NopLabelFor(model => model.ShippingAddress.Email):@Html.RequiredHint()
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.ShippingAddress.Email, new {autocomplete = "off"})
+        <div>@Html.ValidationMessageFor(model => model.ShippingAddress.Email)</div>
+    </td>
+</tr>
+@if (Model.ShippingAddress.CompanyEnabled)
+{
+<tr>
+    <td>
+        @Html.NopLabelFor(model => model.ShippingAddress.Company):
+        @if (Model.ShippingAddress.CompanyRequired)
+        {
+            @Html.RequiredHint()
+        }
+    </td>
+    <td>
+        @Html.TextBoxFor(model => model.ShippingAddress.Company, new {autocomplete = "off"})
+        <div>@Html.ValidationMessageFor(model => model.ShippingAddress.Company)</div>
+    </td>
+</tr>
+}
+
+
+@if (Model.ShippingAddress.CountryEnabled)
+{
+        <tr id="record-address-country">
+            <td>
+                @Html.NopLabelFor(model => model.ShippingAddress.CountryId):
+                @Html.RequiredHint()
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.ShippingAddress.CountryId, Model.ShippingAddress.AvailableCountries, new {autocomplete = "off"})
+                <div>@Html.ValidationMessageFor(model => model.ShippingAddress.CountryId)</div>
+            </td>
+        </tr>
+}
+@if (Model.ShippingAddress.CountryEnabled && Model.ShippingAddress.StateProvinceEnabled)
+{
+    <tr id="record-address-stateprovince">
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.StateProvinceId):
+            @Html.RequiredHint()
+        </td>
+        <td>
+            @Html.DropDownListFor(model => model.ShippingAddress.StateProvinceId, Model.ShippingAddress.AvailableStates, new {autocomplete = "off"})
+            <span id="shippingstates-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+            <div>@Html.ValidationMessageFor(model => model.ShippingAddress.AvailableStates)</div>
+        </td>
+    </tr>
+}
+@if (Model.ShippingAddress.CityEnabled)
+{
+<tr id="record-address-city">
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.City):
+            @if (Model.ShippingAddress.CityRequired)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.City, new {autocomplete = "off"})
+            <div>@Html.ValidationMessageFor(model => model.ShippingAddress.City)</div>
+        </td>
+    </tr>
+}
+@if (Model.ShippingAddress.StreetAddressEnabled)
+{
+    <tr id="record-address-streetaddress">
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.Address1):
+            @if (Model.ShippingAddress.StreetAddressRequired)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.Address1, new {autocomplete = "off"})
+            <br>
+            @Html.ValidationMessageFor(model => model.ShippingAddress.Address1)
+        </td>
+    </tr>
+}
+@if (Model.ShippingAddress.StreetAddress2Enabled)
+{
+    <tr id="record-address-streetaddress2">
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.Address2):
+            @if (Model.ShippingAddress.StreetAddress2Required)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.Address2, new {autocomplete = "off"})
+            <br>
+            @Html.ValidationMessageFor(model => model.ShippingAddress.Address2)
+        </td>
+    </tr>
+}
+@if (Model.ShippingAddress.ZipPostalCodeEnabled)
+{
+        <tr id="record-address-zippostalcode">
+        <td>
+            @Html.NopLabelFor(model => model.ShippingAddress.ZipPostalCode):
+            @if (Model.ShippingAddress.ZipPostalCodeRequired)
+            {
+                @Html.RequiredHint()
+            }
+        </td>
+        <td>
+            @Html.TextBoxFor(model => model.ShippingAddress.ZipPostalCode, new {autocomplete = "off"})
+            <br>
+            @Html.ValidationMessageFor(model => model.ShippingAddress.ZipPostalCode)
+        </td>
+    </tr>
+}
+@if (Model.AllowUseBillingAddress)
+{
+   <tr id="record-usebillingaddress" class="recordusebillingaddress">
+        <td colspan="2">
+                @Html.NopLabelFor(model => model.UseDifferentAddressForBilling):
+                @Html.CheckBoxFor(model => model.UseDifferentAddressForBilling, new {autocomplete = "off"})
+                @Html.Partial(Model.GetViewPath("_BillingAddress"), Model)
+        </td>
+   </tr>
+} 

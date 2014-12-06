@@ -1,0 +1,42 @@
+﻿@model ShoppingCartModel.DiscountBoxModel
+@using Nop.Web.Models.ShoppingCart;
+@if (Model.Display)
+{
+    <div id="discount-tab">
+
+        <div class="form-group  clearfix ">
+            <label class="form-label">
+                @T("ShoppingCart.DiscountCouponCode")
+            </label>
+            <input name="discountcouponcode" type="text" placeholder="@T("ShoppingCart.DiscountCouponCode.Tooltip")" class="ui-input large" />
+            @if (!String.IsNullOrEmpty(Model.Message))
+            {
+                <span class="ui-tooltips arrow-left-center warning ">
+                    <i class="icon"></i>
+                    @Model.Message
+                </span>
+               
+            }
+
+            @if (!String.IsNullOrEmpty(Model.CurrentCode))
+            {
+                <span class="ui-tooltips arrow-left-center warning ">
+                    <i class="icon"></i>
+                    @string.Format(T("ShoppingCart.DiscountCouponCode.CurrentCode").Text, Model.CurrentCode)
+                </span>
+                  
+                <div class="form-float-submit">
+                    <input type="submit" value="@T("Common.Remove")" name="removediscountcouponcode" class="ui-button primary huge" />
+                </div>
+   
+            }
+            <div class="form-float-submit">
+                <input type="submit" value="@T("ShoppingCart.DiscountCouponCode.Button")" name="applydiscountcouponcode" class="ui-button primary huge" />
+            </div>
+        </div>
+
+    </div>
+    
+    
+    
+}

@@ -1,0 +1,46 @@
+﻿@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Themes
+@{
+    var currentThemeName = EngineContext.Current.Resolve<IThemeContext>().WorkingDesktopTheme;
+    var logoPath = "~/Themes/" + currentThemeName + "/Content/images/logo.png";
+}
+
+<div class="header">
+	<div class="header-top">
+		<div class="container">
+			<a id="simple-menu" style="float:left;" class="btn hidden-md hidden-lg" href="#sidr"><i class="fa fa-lg fa-bars"></i></a>
+	 
+			<div id="sidr">
+			  <!-- Your content -->
+			  @Html.Action("HeaderLinks", "Common")
+			</div>
+			 
+			<script>
+			$(document).ready(function() {
+			  $('#simple-menu').sidr();
+			});
+			</script>
+			<div class="desktop_headerlinks">
+				@Html.Action("HeaderLinks", "Common")
+				@Html.Action("FlyoutShoppingCart", "ShoppingCart")
+			</div>
+		</div>
+	</div>
+		
+	
+	<div class="header-bottom">
+		<div class="container">
+			@Html.Widget("header")
+			<div class="header-logo">
+				<a href="@Url.RouteUrl("HomePage")">
+					<img title="" alt="" src="@Url.Content(logoPath)">
+				</a>
+			</div>
+			<div class="search-box">
+				@Html.Action("SearchBox", "Catalog")
+			</div>
+		</div>
+	</div>
+</div>
+
+

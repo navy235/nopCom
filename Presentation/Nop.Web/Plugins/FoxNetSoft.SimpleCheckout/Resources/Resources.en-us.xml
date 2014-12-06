@@ -1,0 +1,206 @@
+﻿<Language Name="English" IsRightToLeft="false">
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.Template">
+    <Value>Checkout template</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.Template.Hint">
+    <Value>Checkout template.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.OrderTemplate">
+    <Value>Order list template</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.OrderTemplate.Hint">
+    <Value>Order list template.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsAllowCustomerToWriteComment">
+    <Value>Allow customer to write comment for order</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsAllowCustomerToWriteComment.Hint">
+    <Value>Allow customer to write comment for order.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsShowHint">
+    <Value>Show hints</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsShowHint.Hint">
+    <Value>Show hints.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.AllowToSelectTheAddress">
+    <Value>Allow to select an address from list</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.AllowToSelectTheAddress.Hint">
+    <Value>Allow to select an address from list on checkout page.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.AllowUseBillingAddress">
+    <Value>Use different address for billing</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.AllowUseBillingAddress.Hint">
+    <Value>Use different address for billing.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.Enable">
+    <Value>Enable Simple Checkout Plugin</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.Enable.Hint">
+    <Value>Enable Simple Checkout Plugin.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.showDebugInfo">
+    <Value>Enable Debugging</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.showDebugInfo.Hint">
+    <Value>Write debugging information into file. In ~/App_Data/ folder.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.SerialNumber">
+    <Value>Serial Number</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.SerialNumber.Hint">
+    <Value>Serial Number.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsRegisted">
+    <Value>Registered version.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.IsNoRegisted">
+    <Value>Unregistered version is fully operational. There is only one limitation – only 100 payments.</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.StoreUrl">
+    <Value>Website address (for registration)</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.StoreUrl.Hint">
+    <Value>Website address (for registration).</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.ClearLogFile">
+    <Value>Clear log-file</Value>
+  </LocaleResource>
+  <LocaleResource Name="Admin.FoxNetSoft.Plugin.Misc.SimpleCheckout.SimpleCheckoutSettings.GetLogFile">
+    <Value>Download log-file</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.CustomerComment">
+    <Value>Add your comment</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.CustomerComment.Hint">
+    <Value>Add your comment.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.Paymentmethod">
+    <Value>Payment method</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.Paymentmethod.Hint">
+    <Value>Select Payment method.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.Shippingoption">
+    <Value>Shipping method</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.Shippingoption.Hint">
+    <Value>Select Shipping method.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.NovaPoshtaCity">
+    <Value>City</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.NovaPoshtaCity.Hint">
+    <Value>City.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.NovaPoshtaCity.Required">
+    <Value>City is required.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.NovaPoshtaAddress">
+    <Value>NovaPoshta. Warehouse.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.NovaPoshtaAddress.Hint">
+    <Value>NovaPoshta. Warehouse.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.FixedAdress">
+    <Value>Address 3</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.FixedAdress.Hint">
+    <Value>Address 3.</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.FixedAdressList">
+    <Value>City1, City2, City3</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.MessageForLogin">
+    <Value>If you already have an account, click here to </Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.ShipmentMethodWarning">
+    <Value>You must select Shipment Method</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.OrderTemplate.UnitPrice">
+    <Value>Unit Price</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.OrderTemplate.Quantity">
+    <Value>Quantity</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.FirstName.Hint">
+    <Value>Enter first name</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.LastName.Hint">
+    <Value>Enter last name</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.PhoneNumber.Hint">
+    <Value>Enter phone number</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.Email.Hint">
+    <Value>Enter email</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.City.Hint">
+    <Value>Enter city</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.Address1.Hint">
+    <Value>Enter address 1</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.Address2.Hint">
+    <Value>Enter address 2</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.Company.Hint">
+    <Value>Enter company</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.FaxNumber.Hint">
+    <Value>Enter faxNumber</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.StateProvince.Hint">
+    <Value>Enter state/province</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.ZipPostalCode.Hint">
+    <Value>Enter zipPostalCode</Value>
+  </LocaleResource>
+  <LocaleResource Name="Address.Fields.Country.Hint">
+    <Value>Select country</Value>
+  </LocaleResource>
+  <LocaleResource Name="ShoppingCart.DiscountCouponCode.Hint">
+    <Value>Enter your coupon here</Value>
+  </LocaleResource>
+  <LocaleResource Name="ShoppingCart.GiftCardCouponCode.Hint">
+    <Value>Enter gift card code</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.ExistingShippingAddresses">
+    <Value>Address List</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.ExistingShippingAddresses.Hint">
+    <Value>Select an address</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.ExistingBillingAddresses">
+    <Value>Address List</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.ExistingBillingAddresses.Hint">
+    <Value>Select an address</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.UseDifferentAddressForBilling">
+    <Value>Use different address for billing</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.UseDifferentAddressForBilling.Hint">
+    <Value>Use different address for billing</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Block.Title">
+    <Value>Billing address</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Block.Edit">
+    <Value>Edit</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Title">
+    <Value>Billing address</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Copy">
+    <Value>Copy shipping address</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Save">
+    <Value>Save</Value>
+  </LocaleResource>
+  <LocaleResource Name="FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Cancel">
+    <Value>Cancel</Value>
+  </LocaleResource>
+</Language>

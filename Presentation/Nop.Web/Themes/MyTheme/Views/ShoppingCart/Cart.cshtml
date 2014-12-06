@@ -1,0 +1,57 @@
+﻿@model ShoppingCartModel
+@using Nop.Web.Models.Checkout
+@using Nop.Web.Models.ShoppingCart;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.ShoppingCart").Text);
+
+    Html.AddScriptParts("~/Themes/MyTheme/Scripts/jquery.numinput.js");
+    Html.AddScriptParts("~/Themes/MyTheme/Scripts/jquery.tabs.js");
+}
+@if (!Model.OnePageCheckoutEnabled && Model.Items.Count > 0)
+{
+    @Html.Action("CheckoutProgress", "Checkout", new { step = CheckoutProgressStep.Cart })
+}
+
+<div class="check-steps">
+    <i class="check-steps-bg"></i>
+    <ul class="check-steps-block">
+        <li>
+            <span>@T("Checkout.Progress.Cart")</span>
+        </li>
+        <li class="current mid">
+            <span>@T("Checkout.Progress.Confirm")</span>
+        </li>
+        <li>
+            <span>成功提交订单</span>
+        </li>
+    </ul>
+</div>
+<div class="mt-box cart-box">
+    <div class="box-hd">
+        <h2 class="box-hd-title">@T("ShoppingCart")</h2>
+    </div>
+    @Html.Partial("OrderSummary", Model)
+</div>
+
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-role="numinput"]').numinput({
+            callback: function () {
+                $('[name="updatecart"]').click();
+            }
+        });
+
+        $('.btn-trash').on('click', function () {
+            $(this).next().prop("checked", true);
+            $('[name="updatecart"]').click();
+        })
+    })
+
+</script>
+
+
+

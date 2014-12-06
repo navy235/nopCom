@@ -1,0 +1,96 @@
+﻿@model CustomerNavigationModel          
+@using Nop.Web.Models.Customer;
+
+<div class="public-sidebar public-sidebar-transition">
+    <dl class="side-btm">
+        <dt><i></i><a>@T("Account.Navigation")</a>
+
+        </dt>
+
+          @if (!Model.HideInfo)
+            {
+              
+                <dd class="@((Model.SelectedTab == CustomerNavigationEnum.Info)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerInfo")">@T("Account.CustomerInfo")</a></dd>                                               
+ 
+            }
+       @if (!Model.HideAddresses)
+            {
+             <dd class="@((Model.SelectedTab == CustomerNavigationEnum.Addresses)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerAddresses")">@T("Account.CustomerAddresses")</a></dd>                                               
+
+            }
+
+          @if (!Model.HideOrders)
+            { 
+             
+               <dd class="@((Model.SelectedTab == CustomerNavigationEnum.Orders)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerOrders")">@T("Account.CustomerOrders")</a></dd>                                               
+            }
+
+             @if (!Model.HideReturnRequests)
+            { 
+               
+               <dd class="@((Model.SelectedTab == CustomerNavigationEnum.ReturnRequests)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerReturnRequests")">@T("Account.CustomerReturnRequests")</a></dd>                                               
+             }
+
+         @if (!Model.HideDownloadableProducts)
+            { 
+          
+              
+               <dd class="@((Model.SelectedTab == CustomerNavigationEnum.DownloadableProducts)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerDownloadableProducts")">@T("Account.DownloadableProducts")</a></dd>                                               
+             
+             
+            }
+
+
+
+         @if (!Model.HideBackInStockSubscriptions)
+            { 
+             
+             
+                <dd class="@((Model.SelectedTab == CustomerNavigationEnum.BackInStockSubscriptions)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerBackInStockSubscriptions")">@T("Account.BackInStockSubscriptions")</a></dd>                                               
+               
+            }
+            @if (!Model.HideRewardPoints)
+            { 
+                
+                   <dd class="@((Model.SelectedTab == CustomerNavigationEnum.RewardPoints)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerRewardPoints")">@T("Account.RewardPoints")</a></dd>                                               
+
+            }
+            @if (!Model.HideChangePassword)
+            { 
+                
+                   <dd class="@((Model.SelectedTab == CustomerNavigationEnum.ChangePassword)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerChangePassword")">@T("Account.ChangePassword")</a></dd>                                               
+              
+            }
+            @if (!Model.HideAvatar)
+            { 
+                
+                   <dd class="@((Model.SelectedTab == CustomerNavigationEnum.Avatar)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerAvatar")">@T("Account.Avatar")</a></dd>                                               
+
+            }
+            @if (!Model.HideForumSubscriptions)
+            { 
+                
+                   <dd class="@((Model.SelectedTab == CustomerNavigationEnum.ForumSubscriptions)?"active":"")">
+                    <a href="@Url.RouteUrl("CustomerForumSubscriptions")">@T("Account.ForumSubscriptions")</a></dd>                                               
+              
+            }
+       
+    </dl>
+    <dl class="side-btm">
+        <dt><i></i><a>我的资产</a></dt>
+
+      
+    </dl>
+    <dl class="side-single side-nav-clear">
+        <dt class="side-nav-clear"><i></i><a href="#">消息中心</a></dt>
+    </dl>
+</div>

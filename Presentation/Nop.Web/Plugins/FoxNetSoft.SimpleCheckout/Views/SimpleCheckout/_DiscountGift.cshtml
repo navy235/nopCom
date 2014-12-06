@@ -1,0 +1,53 @@
+﻿@model FoxNetSoft.Plugin.Misc.SimpleCheckout.Models.SimpleCheckoutModel
+@using System.Globalization
+@using System.Text
+@using Nop.Core
+@using Nop.Web.Framework.UI
+@using Nop.Web.Framework
+@using FoxNetSoft.Plugin.Misc.SimpleCheckout.Models
+@if (Model.DiscountBox.Display)
+{
+    <tr>
+        <td>
+            @Html.NopLabelFor(model => model.DiscountBox.CurrentCode):
+        </td>
+        <td>
+            <div class="coupon-code">
+                <input id="discountcouponcode" name="discountcouponcode" type="text" class="discount-coupon-code" value="@Model.DiscountBox.CurrentCode" autocomplete="off"/>
+                <div class="buttons">
+                    <input type="button" name="applydiscountcouponcode" value="@T("ShoppingCart.DiscountCouponCode.Button")" class="button-2 apply-discount-coupon-code-button" onclick="fns_simplecheckout_applydiscountcouponcode()"/>
+                    @if (!String.IsNullOrEmpty(Model.DiscountBox.CurrentCode))
+                    {
+                        <input type="button" id="removediscountcouponcode" name="removediscountcouponcode" value="@T("Common.Remove")" class="button-2 remove-discount-button" onclick="fns_simplecheckout_removediscountcouponcode()"/>
+                    }
+                    else
+                    {
+                        <input type="button" id="removediscountcouponcode" name="removediscountcouponcode" value="@T("Common.Remove")" class="button-2 remove-discount-button" onclick="fns_simplecheckout_removediscountcouponcode()" style="display:none;"/>
+                    }
+                </div>
+                <div id="discountcouponcodemessage" class="message">
+                    @Model.DiscountBox.Message
+                </div>
+            </div>
+        </td>
+    </tr>  
+}  
+@if (Model.GiftCardBox.Display)
+{
+    <tr>
+        <td>
+            @Html.NopLabelFor(model => model.GiftCardBox.CurrentGiftCardCode):
+        </td>
+        <td>
+            <div class="coupon-code">
+                <input id="giftcardcouponcode" name="giftcardcouponcode" type="text" class="gift-card-coupon-code" autocomplete="off"/>
+                <div class="buttons">
+                    <input type="button" name="applygiftcardcouponcode" value="@T("ShoppingCart.GiftCardCouponCode.Button")" class="button-2 apply-gift-card-coupon-code-button" onclick="fns_simplecheckout_applygiftcardcouponcode()"/>
+                </div>
+                <div id="giftcardmessage" class="message">
+                    @Model.GiftCardBox.Message
+                </div>
+            </div>
+        </td>
+    </tr>  
+}                    

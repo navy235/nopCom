@@ -1,0 +1,159 @@
+﻿@model OrderTotalsModel
+@using Nop.Web.Models.ShoppingCart;
+
+<div class="total_area">
+    <ul>
+        <li class="summary">
+            <span class="m-price">
+                <span class="u-price">@Model.SubTotal</span>
+            </span>
+            @Html.Raw(string.Format(T("ShoppingCart.Totals.ProductTotal").Text, Model.ProductCount))
+            &nbsp;&nbsp;@T("ShoppingCart.Totals.SubTotal")
+        </li>
+        <!-------------折扣总价？---------------->
+        @if (!String.IsNullOrEmpty(Model.SubTotalDiscount))
+        {
+            <li class="discount">
+                <span class="m-price">
+                    <span class="u-price">@Model.SubTotalDiscount</span>
+                </span>
+                @T("ShoppingCart.Totals.SubTotalDiscount")
+                @if (Model.AllowRemovingSubTotalDiscount)
+                {
+                    /*empty value (little hack for FormValueExistsAttribute)*/
+                    <input type="submit" name="removesubtotaldiscount" value=" " title="@T("Common.Remove")" class="remove-discount-button" />
+                }
+            </li>
+        }
+        <!-------------运费？---------------->
+        <li class="summary">
+            <span class="m-price">
+                <span class="u-price">
+                    @if (Model.RequiresShipping)
+                    {
+                        if (!String.IsNullOrEmpty(Model.Shipping))
+                        {
+                        @Model.Shipping
+                        }
+                        else
+                        {
+                        @T("ShoppingCart.Totals.CalculatedDuringCheckout")
+                        }
+                    }
+                    else
+                    {
+                        @T("ShoppingCart.Totals.Shipping.NotRequired")
+                    }
+                </span>
+            </span>
+
+            @T("ShoppingCart.Totals.Shipping")
+
+            @if (Model.RequiresShipping && !String.IsNullOrEmpty(Model.SelectedShippingMethod))
+            {
+                        
+                @T("ShoppingCart.Totals.Shipping.Method", Model.SelectedShippingMethod)
+                       
+            }
+        </li>
+        <!-------------支付费用？---------------->
+        @if (!String.IsNullOrEmpty(Model.PaymentMethodAdditionalFee))
+        {
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@Model.PaymentMethodAdditionalFee</span>
+                </span>
+                @T("ShoppingCart.Totals.PaymentMethodAdditionalFee")
+            </li>
+        }
+        <!-------------运费率？---------------->
+        @if (Model.DisplayTaxRates && Model.TaxRates.Count > 0)
+        {
+            foreach (var taxRate in Model.TaxRates)
+            {
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@taxRate.Value</span>
+                </span>
+                @string.Format(T("ShoppingCart.Totals.TaxRateLine").Text, taxRate.Rate)
+            </li>
+            }
+        }
+        <!-------------运费？---------------->
+        @if (Model.DisplayTax)
+        {
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@Model.Tax</span>
+                </span>
+                @T("ShoppingCart.Totals.Tax")
+            </li>
+        }
+        <!-------------总折扣---------------->
+        @if (!String.IsNullOrEmpty(Model.OrderTotalDiscount))
+        {
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@Model.OrderTotalDiscount</span>
+                </span>
+                @T("ShoppingCart.Totals.OrderTotalDiscount")
+                @if (Model.AllowRemovingOrderTotalDiscount)
+                {
+                    /*empty value (little hack for FormValueExistsAttribute)*/
+                    <input type="submit" name="removeordertotaldiscount" value=" " title="@T("Common.Remove")" class="remove-discount-button" />
+                }
+
+            </li>
+        }
+        @if (Model.GiftCards.Count > 0)
+        {
+            foreach (var gc in Model.GiftCards)
+            {
+                
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@gc.Amount
+                        <span>@string.Format(T("ShoppingCart.Totals.GiftCardInfo.Remaining").Text, gc.Remaining)</span>
+                    </span>
+                </span>
+                @T("ShoppingCart.Totals.GiftCardInfo", gc.CouponCode)
+                @if (Model.IsEditable)
+                {
+                    //little hack here with empty "value" element
+                    <input type="submit" name="removegiftcard-@gc.Id" value=" " title="@T("Common.Remove")" class="remove-gift-card-button" />
+                }
+            </li>
+     
+            }
+        }
+
+        @if (Model.RedeemedRewardPoints > 0)
+        {
+            
+            <li class="summary">
+                <span class="m-price">
+                    <span class="u-price">@Model.RedeemedRewardPointsAmount</span>
+                </span>
+                @string.Format(T("ShoppingCart.Totals.RewardPoints").Text, Model.RedeemedRewardPoints)
+            </li>
+        }
+
+        <li class="amount">
+            <span class="m-price ">
+                <span class="u-price">
+                    @if (!String.IsNullOrEmpty(Model.OrderTotal))
+                    {
+                        @Model.OrderTotal
+                    }
+                    else
+                    {
+                        @T("ShoppingCart.Totals.CalculatedDuringCheckout")
+                    }
+
+                </span>
+            </span>
+            @T("ShoppingCart.Totals.OrderTotal")
+
+        </li>
+    </ul>
+</div>

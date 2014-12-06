@@ -1,0 +1,75 @@
+﻿@model CustomerAddressListModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Partial("MyAccountNavigation", Model.NavigationModel, new ViewDataDictionary())
+}
+
+@section  bread{
+    <div class="breadcrumbs">
+        <a href="@Url.RouteUrl("CustomerInfo")" >@T("Account.MyAccount") </a>
+        &nbsp;&gt;&nbsp; @T("Account.CustomerAddresses")
+    </div>
+}
+<div id="addressList" class="form-container bordered">
+    <div class="form-header">
+        <h3>@T("Account.CustomerAddresses")</h3>
+        <button  class="ui-button primary form-header-button" onclick="location.href='@Url.RouteUrl("CustomerAddressAdd")'">@T("Common.AddNew")</button>
+    </div>
+    <div class="addr-list clearfix">
+        @if (Model.Addresses.Count > 0)
+        {
+            for (int i = 0; i < Model.Addresses.Count; i++)
+            {
+                var address = Model.Addresses[i];
+            <div class="addr-item default" data-id="@address.Id">
+                <div class="border">
+                    <strong class="name">@(address.LastName)@(address.FirstName)</strong>
+                    <p class="address-content long" title="@address.Address1">@address.Address1</p>
+                    <p class="phone">@address.PhoneNumber</p>
+                    <p class="time">@address.ZipPostalCode</p>
+                    <span class="set">
+                        <a href="javascript:;">设为默认地址</a>
+                    </span>
+                    <span class="opt">
+                        <a href="@(Url.RouteUrl("CustomerAddressEdit", new { addressId = address.Id }))" >@T("Common.Edit")</a>
+                        <a href="javascript:;" onclick="if (confirm('@(T("Common.AreYouSure").Text)')) {location.href='@(Url.RouteUrl("CustomerAddressDelete", new { addressId = address.Id }))';}" >@T("Common.Delete")</a>
+                    </span>
+                </div>
+            </div>
+            }
+        }
+        else
+        {
+            @T("Account.CustomerAddresses.NoAddresses")
+        }
+
+
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('.addr-item').hover(function () {
+            $(this).addClass('on');
+            $(this).find('.set').css({
+                top: 0
+            });
+            $(this).find('.opt').show();
+        }, function () {
+            $(this).removeClass('on');
+            $(this).find('.set').css({
+                top: "-18px"
+            });
+            $(this).find('.opt').hide();
+        })
+    })
+
+</script>

@@ -1,0 +1,19 @@
+﻿@model LanguageSelectorModel
+@using Nop.Web.Models.Common;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@if (Model.AvailableLanguages.Count > 1)
+{
+    var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+
+    <ul class="nav-top-language">
+        @foreach (var lang in Model.AvailableLanguages)
+        {
+            <li><a href="@webHelper.ModifyQueryString(Url.RouteUrl("ChangeLanguage", new { langid = lang.Id }), "returnurl=" + HttpUtility.UrlEncode(HttpContext.Current.Request.RawUrl), null)"  class="@(lang.Id.Equals(Model.CurrentLanguageId) ? "current" : "")">
+                
+                <img  src="@Url.Content("~/Content/Images/flags/" + lang.FlagImageFileName)" />
+                @lang.Name</a></li>
+        }
+    </ul>
+}
+

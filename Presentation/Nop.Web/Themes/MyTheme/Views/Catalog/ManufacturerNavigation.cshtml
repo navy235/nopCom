@@ -1,0 +1,25 @@
+﻿@model ManufacturerNavigationModel
+@using Nop.Web.Models.Catalog;
+@if (Model.Manufacturers.Count > 0)
+{
+    <!--brands_products start-->
+    <div class="main-brand">
+        <h2 class="brand-title">@T("Manufacturers")</h2>
+        <div class="brand-content">
+            <p class="brand-wall-pannel">
+                @foreach (var manufacturer in Model.Manufacturers)
+                {
+                    <a  class="brand-item" href="@Url.RouteUrl("Manufacturer", new { SeName = manufacturer.SeName })">
+                        <img  class="brand-logo" src="@manufacturer.Logo" alt="@manufacturer.Name" />
+                    </a>
+                }
+            </p>
+        </div>
+    </div>
+    <!--brands_products end-->
+
+
+  
+
+   
+}

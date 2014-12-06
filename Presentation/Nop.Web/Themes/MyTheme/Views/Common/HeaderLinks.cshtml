@@ -1,0 +1,82 @@
+﻿@model HeaderLinksModel
+@using Nop.Web.Models.Common;
+
+<nav class="top-nav">
+    <div class="head-inner">
+        @Html.Action("LanguageSelector", "Common")
+        <ul class="nav-top-tool">
+            @if (Model.IsAuthenticated)
+            {
+                <li><a href="@Url.RouteUrl("CustomerInfo")">@Model.CustomerEmailUsername</a></li>
+            }
+            else
+            {
+                <li><a href="@Url.RouteUrl("Register")" >@T("Account.Register")</a></li>
+                <li><a href="@Url.RouteUrl("Login")" >@T("Account.Login")</a></li>
+            }
+            <li><a href="@Url.RouteUrl("CustomerOrders")">@T("Account.CustomerOrders")</a></li>
+            @if (Model.WishlistEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Wishlist")">@T("Wishlist")
+                    <span class="wishlist-qty">@T("Wishlist.HeaderQuantity", Model.WishlistItems)</span>
+                </a></li>
+            }
+
+            @if (Model.IsAuthenticated)
+            { 
+                <li><a href="@Url.RouteUrl("Logout")" >@T("Account.Logout")</a></li>
+            }
+
+            @if (Model.AllowPrivateMessages)
+            {
+                <li><a href="@Url.RouteUrl("PrivateMessages", new { tab = "" })"><i class="fa fa-envelope"></i>@T("PrivateMessages.Inbox")</a>
+                    @Model.UnreadPrivateMessages</li>
+                if (!string.IsNullOrEmpty(Model.AlertMessage))
+                {
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        displayPopupNotification('@Html.Raw(HttpUtility.JavaScriptStringEncode(Model.AlertMessage))', 'success', false);
+                    });
+                </script>
+                }
+            }
+        </ul>
+    </div>
+</nav>
+<div class="head-logo">
+    <div class="head-inner">
+        <div class="head-logo-dop">
+            <a href="@Url.RouteUrl("HomePage")">
+                <img src="@Url.Content("~/Themes/MyTheme/Content/css/images/header_logo.png")" alt="一家专门做特卖的网站">
+            </a>
+        </div>
+        <!-- 购物车 -->
+
+        @if (Model.ShoppingCartEnabled)
+        { 
+            <div id="shop-cart" class="head-cart">
+                <div class="tool" id="topcartlink">
+                    <a href="@Url.RouteUrl("ShoppingCart")" target="_blank">
+                        <i class="icon-arrc"></i>
+                        <i class="icon-bag" title="@T("ShoppingCart")"></i>
+                        @T("ShoppingCart")
+                        <span class="nub cart-qty">@T("ShoppingCart.HeaderQuantity", Model.ShoppingCartItems)</span>
+                    </a>
+                </div>
+                @Html.Action("FlyoutShoppingCart", "ShoppingCart")
+                <!-- 购物车end -->
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('#shop-cart').hover(function () {
+            $('#flyout-cart').show();
+        }, function () {
+            $('#flyout-cart').hide();
+        })
+    })
+
+</script>

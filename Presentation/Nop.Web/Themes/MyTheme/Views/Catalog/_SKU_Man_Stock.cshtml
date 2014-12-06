@@ -1,0 +1,76 @@
+﻿@model ProductDetailsModel
+@using Nop.Web.Models.Catalog;
+@*SKU*@
+
+@if (!String.IsNullOrWhiteSpace(Model.Sku) && Model.ShowSku)
+{
+    
+    <dl class="pro-sku pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.Sku")：</dt>
+        <dd class="pro-attr-content">
+            <span>@Model.Sku</span>
+        </dd>
+    </dl>
+
+}
+@*Manufacturer part number*@
+@if (!String.IsNullOrWhiteSpace(Model.ManufacturerPartNumber) && Model.ShowManufacturerPartNumber)
+{
+    <dl class="pro-manu pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.ManufacturerPartNumber")：</dt>
+        <dd class="pro-attr-content">
+            <span>@Model.ManufacturerPartNumber</span>
+        </dd>
+    </dl>
+  
+}
+@*GTIN*@
+@if (!String.IsNullOrWhiteSpace(Model.Gtin) && Model.ShowGtin)
+{
+    <dl class="pro-gtin pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.GTIN")：</dt>
+        <dd class="pro-attr-content">
+            <span>@Model.Gtin</span>
+        </dd>
+    </dl>
+}
+@*Stock availability*@
+@if (!String.IsNullOrWhiteSpace(Model.StockAvailability))
+{
+    <dl class="pro-stock pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.Availability")：</dt>
+        <dd class="pro-attr-content">
+            <span>@Model.StockAvailability</span>
+        </dd>
+    </dl>
+   
+    
+}
+@*Delivery date*@
+@if (Model.FreeShippingNotificationEnabled && Model.IsFreeShipping)
+{
+  
+    <b>Free Shipping</b>
+}
+@*Delivery date*@
+@if (!String.IsNullOrWhiteSpace(Model.DeliveryDate))
+{
+    <dl class="pro-delivery pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.DeliveryDate")：</dt>
+        <dd class="pro-attr-content">
+            <span>@Model.DeliveryDate</span>
+        </dd>
+    </dl>
+   
+}
+@*Vendor*@
+@if (Model.ShowVendor)
+{
+    <dl class="pro-vendor pro-attr-dl clearfix">
+        <dt class="pro-attr-title">@T("Products.Vendor")：</dt>
+        <dd class="pro-attr-content">
+            <span><a href="@Url.RouteUrl("Vendor", new { vendorId = Model.VendorModel.Id, SeName = Model.VendorModel.SeName })">@Model.VendorModel.Name</a></span>
+        </dd>
+    </dl>
+}
+

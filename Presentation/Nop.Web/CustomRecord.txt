@@ -1,0 +1,65 @@
+﻿2014.11.21
+1.添加 catelog  productreviewlist 的action
+修改了PrepareProductReviewsModel 方法同时修改了
+ProductReviewsModel 模型
+将ProductReviewOverviewModel 作为 ProductReviewsModel 的一个属性
+
+
+2.添加customer avtar 字段 用户头像
+
+
+3.修改registerModel 的字段验证
+修改了register 的view的相关配置
+有很多不需要的注册字段，越简单越好
+
+4.添加语言
+
+account.registertip
+没有账号？请注册
+No account? Please register
+
+account.registered
+已注册？
+Already registered ?
+
+5.修改登录Model
+
+
+2014.11.25
+————————————————————————————
+6.修改注册Model 将里面的一些注册的字段去掉，包括controller  ，viewmodel, validate
+
+
+
+2014.11.26
+7.添加订单多语言字段
+
+ Account.CustomerOrders.Product
+ 商品
+ Products
+
+ Account.CustomerOrders.Control
+ 操作
+ Control
+
+ Account.CustomerOrders.OtherControl
+ 其他操作
+ OtherControl
+
+8.添加customerorderlistmodel 的 orderitemmodel
+需要修改CustomerController里的Orderes Action
+
+
+
+9.添加多语言字段
+
+ReturnRequests.Products.Status
+
+
+rewardpoints.current
+
+rewardpoints.value
+
+
+10.语言字段
+

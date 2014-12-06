@@ -1,0 +1,109 @@
+﻿@model TopMenuModel
+@using System.Text.RegularExpressions
+@using Nop.Web.Models.Catalog;
+@{
+    var isRtl = this.ShouldUseRtlTheme();
+}
+
+@helper RenderSubCategoryLine(CategorySimpleModel category, int level)
+{
+    <li class="dropdown">
+        <a class="dropdown-toggle" href="#">@category.Name
+            <i class="icon-arrow-down"></i>
+        </a>
+        <ul class="dropdown-menu sub-menu">
+            @foreach (var subCategory in category.SubCategories)
+            {
+                @RenderCategoryLine(subCategory, level + 1)
+            }
+        </ul>
+    </li>
+}
+
+@helper RenderCategoryLine(CategorySimpleModel category, int level)
+{
+    if (category.SubCategories.Count > 0)
+    {
+    @RenderSubCategoryLine(category, 0)
+    }
+    else
+    {
+    <li>
+        <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">@category.Name
+        </a>
+    </li>
+    }
+}
+
+@helper RenderCategorySingleLine(CategorySimpleModel category, int level)
+{
+ 
+    <li class="menu-nav">
+        <a href="@Url.RouteUrl("Category", new { SeName = category.SeName })">@category.Name
+        </a>
+    </li>
+}
+
+
+<div class="main-nav">
+    <div class="head-inner nav-container">
+        <ul class="main-nav-link">
+            @Html.Widget("header_menu_before")
+            <li><a href="@Url.RouteUrl("HomePage")">@T("HomePage")</a></li>
+
+
+            @if (Model.RecentlyAddedProductsEnabled)
+            {
+                <li><a href="@Url.RouteUrl("RecentlyAddedProducts")">@T("Products.NewProducts")</a>
+                </li>
+            }
+@*
+                <li><a href="@Url.RouteUrl("ProductSearch")">@T("Search")</a> </li>
+                <li><a href="@Url.RouteUrl("CustomerInfo")">@T("Account.MyAccount")</a></li>*@
+            @if (Model.BlogEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Blog")">@T("Blog")</a></li>
+            }
+            @if (Model.ForumEnabled)
+            {
+                <li><a href="@Url.RouteUrl("Boards")">@T("Forum.Forums")</a></li>
+            }
+            <li><a href="@Url.RouteUrl("ContactUs")">@T("ContactUs")</a></li>
+
+        </ul>
+
+        <div class="main-categorys @(Model.FixedMenu ? "fixed" : "")">
+            <h3><a href="#" target="_blank">@T("Categories")</a>  <i class="icon-arrow-down"></i></h3>
+            <div class="categroup">
+                <ul>
+                    @if (Model.Categories.Count > 0)
+                    {
+                        foreach (var category in Model.Categories)
+                        {
+                        @RenderCategorySingleLine(category, 0)
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    $(function () {
+        $('.menu-nav').hover(function (e) {
+            $(this).addClass('hover')
+            $('.menu-nav').removeClass('selected')
+        }, function () {
+            $(this).removeClass('hover')
+            $(this).addClass('selected');
+        })
+
+        $('.main-categorys').hover(function (e) {
+            $(this).addClass('hover')
+        }, function (e) {
+            $(this).removeClass('hover')
+        })
+    })
+</script>

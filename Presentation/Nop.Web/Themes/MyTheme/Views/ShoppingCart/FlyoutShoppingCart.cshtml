@@ -1,0 +1,50 @@
+﻿@model MiniShoppingCartModel
+@using Nop.Web.Models.ShoppingCart;
+
+<div id="flyout-cart" class="flyout-cart tool-cn">
+    <div class="mini-shopping-cart">
+
+        @if (Model.TotalProducts == 0)
+        {
+            <div class="count">
+                @T("ShoppingCart.Mini.NoItems")
+            </div>
+        }
+
+
+        @if (Model.TotalProducts > 0)
+        {   
+            <ul>
+
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var item = Model.Items[i];
+                    <li>
+                        <div class="list-team @(i == 0 ? "first" : null)">
+                            <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank" >
+                                <img class="list-team-pic" alt="@item.Picture.AlternateText"  src="@item.Picture.ImageUrl" title="@item.Picture.Title" />
+                            </a>
+                            <p><a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank" >@item.ProductName</a></p>
+                            @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                            {
+                                <div class="list-team-attr" title="@Html.Raw(item.AttributeInfo)">
+                                    @Html.Raw(item.AttributeInfo)
+                                </div>
+                            }
+                        </div>
+                        <div class="list-team-nub">@item.UnitPrice<em> Χ @item.Quantity</em></div>
+                    </li>
+                }
+            </ul>
+            <div class="list-team-ft">
+                <span class="oper">@Html.Raw(string.Format(T("ShoppingCart.Mini.Items").Text, "<em>" + Model.TotalProducts + "</em>"))</span>
+                <span id="cart-total">@T("ShoppingCart.Totals.SubTotal")：<em class="font-tips">@Model.SubTotal</em></span>
+                <a href="@Url.RouteUrl("Checkout")" target="_blank">
+                    <span class="btn btn-acc">@T("Checkout.Button")</span>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+

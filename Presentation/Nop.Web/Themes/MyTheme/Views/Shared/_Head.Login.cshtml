@@ -1,0 +1,15 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.Login.cshtml";
+}
+<div class="header">
+    <a href="http://www.vip.com" class="logo sprite" id="for-cascade-login-link"></a>
+    <div class="bannerHeader sprite"></div>
+</div>
+
+<div class="content login_ad clear" @Html.Widget("login_background")>
+     @RenderBody()
+</div>
+
+<div class="footer">
+    <div class="copyright">Copyright 2008-2014 vip.com，All Rights Reserved ICP证：粤 B2-20080329</div>
+</div>

@@ -1,0 +1,50 @@
+@{
+    Layout = "~/Themes/NopRoot/Views/Shared/_ColumnsOneHomepage.cshtml";
+}
+@*@Html.Action("TopicBlock", "Topic", new { systemName = "HomePageText" })*@
+
+<!--HomepageCategories start--->
+
+@Html.Action("HomepageCategories", "Catalog")
+
+<!--HomepageCategories end--->
+
+<!--HomepageProducts start--->
+
+@Html.Action("HomepageProducts", "Catalog")
+
+<!--HomepageProducts end--->
+
+<!--NewArrivals start--->
+@Html.Partial("NewArrivals")
+<!--NewArrivals end--->
+
+<!--HomepageBestSellers start--->
+
+@Html.Action("HomepageBestSellers", "Catalog")
+
+<!--HomepageBestSellers end--->
+
+<!--HomePageNews start--->
+
+@Html.Action("HomePageNews", "News")
+
+<!--HomePageNews end--->
+
+<!--HomePagePolls start--->
+
+@Html.Action("HomePagePolls", "Poll")
+
+<!--HomePagePolls end--->
+
+@*@Html.Widget("home_page_bottom")*@
+
+
+
+
+
+
+
+
+
+

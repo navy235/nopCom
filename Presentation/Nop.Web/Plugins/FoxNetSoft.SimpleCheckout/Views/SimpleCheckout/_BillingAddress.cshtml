@@ -1,0 +1,314 @@
+﻿@model FoxNetSoft.Plugin.Misc.SimpleCheckout.Models.SimpleCheckoutModel
+@using System.Globalization
+@using System.Text
+@using Nop.Core
+@using Nop.Web.Framework.UI
+@using Nop.Web.Framework
+@using FoxNetSoft.Plugin.Misc.SimpleCheckout.Models
+@Html.HiddenFor(model => model.BillingAddress.Id)   
+
+<div class="billing-address-description" style="display: none;">
+    <div class="billing-address-description-message">
+        <ul class="billing-address-info">
+            <li class="name">
+                @Model.BillingAddress.FirstName @Model.BillingAddress.LastName
+            </li>
+            <li class="email">
+                @Html.LabelFor(model => model.BillingAddress.Email, new { }, ":")
+                @Model.BillingAddress.Email
+            </li>
+            @if (Model.BillingAddress.PhoneEnabled)
+            {
+                <li class="phone">
+                    @Html.LabelFor(model => model.BillingAddress.PhoneNumber, new { }, ":")
+                    @Model.BillingAddress.PhoneNumber
+                </li>
+            }
+            @if (Model.BillingAddress.FaxEnabled)
+            {
+                <li class="fax">
+                    @Html.LabelFor(model => model.BillingAddress.FaxNumber, new { }, ":")
+                    @Model.BillingAddress.FaxNumber
+                </li>
+            }
+            @if (Model.BillingAddress.CompanyEnabled && !String.IsNullOrEmpty(Model.BillingAddress.Company))
+            {
+                <li class="company">@Model.BillingAddress.Company</li>
+            }
+            @if (Model.BillingAddress.StreetAddressEnabled)
+            {
+                <li class="address1">
+                    @Model.BillingAddress.Address1
+                </li>
+            }
+            @if (Model.BillingAddress.StreetAddress2Enabled && !String.IsNullOrEmpty(Model.BillingAddress.Address2))
+            {
+                <li class="address2">
+                    @Model.BillingAddress.Address2
+                </li>
+            }
+            @if (Model.BillingAddress.CityEnabled || Model.BillingAddress.StateProvinceEnabled || Model.BillingAddress.ZipPostalCodeEnabled)
+            {
+                var cityStateZip = "";
+                if (Model.BillingAddress.CityEnabled)
+                {
+                    cityStateZip = Model.BillingAddress.City;
+                    if (Model.BillingAddress.StateProvinceEnabled || Model.BillingAddress.ZipPostalCodeEnabled)
+                    {
+                        cityStateZip += ",";
+                    }
+                }
+                if (Model.BillingAddress.StateProvinceEnabled)
+                {
+                    if (!String.IsNullOrEmpty(cityStateZip))
+                    {
+                        cityStateZip += " ";
+                    }
+                    cityStateZip += Model.BillingAddress.StateProvinceName;
+                }
+                if (Model.BillingAddress.ZipPostalCodeEnabled)
+                {
+                    if (!String.IsNullOrEmpty(cityStateZip))
+                    {
+                        cityStateZip += " ";
+                    }
+                    cityStateZip += Model.BillingAddress.ZipPostalCode;
+                }
+                            
+                <li class="city-state-zip">
+                    @cityStateZip
+                </li>
+            }
+            @if (Model.BillingAddress.CountryEnabled && !String.IsNullOrEmpty(Model.BillingAddress.CountryName))
+            {
+                <li class="country">
+                    @Model.BillingAddress.CountryName
+                </li>
+            }
+        </ul>
+    </div>
+    <input class="button-2 edit-billing-address-button" type="button" onclick="editBillingAddress()" value="@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Block.Edit")">
+</div>
+<div id="billingaddresswindow" title="@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Title")" style="display:none;">
+<div id="simple-checkout-billing-address-block" class="simple-checkout-billing-address-block">
+    <div class="billing-address-window-buttons-up">
+        <input class="button-2 billing-address-window-button" type="button" onclick="copyShippingToBillingAddress()" value="@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Copy")">
+    </div>
+    <table class="simple-checkout-billing-address-table">
+        @if (Model.AllowToSelectTheAddress && Model.ExistingBillingAddresses.Count() > 1)
+        {
+            <tr>
+                <td>
+                    @Html.NopLabelFor(model => model.ExistingBillingAddresses):
+                </td>
+                <td>
+                    <select name="existingbillingaddresses" id="existingbillingaddresses" onchange="changeBillingAddress(this.value)" autocomplete="off">
+                        @foreach (var address in Model.ExistingBillingAddresses)
+                        {
+                            var addressLine = "";
+                            addressLine += address.FirstName;
+                            addressLine += " " + address.LastName;
+                            if (address.StreetAddressEnabled && !String.IsNullOrEmpty(address.Address1))
+                            {
+                                addressLine += ", " + address.Address1;
+                            }
+                            if (address.CityEnabled && !String.IsNullOrEmpty(address.City))
+                            {
+                                addressLine += ", " + address.City;
+                            }
+                            if (address.StateProvinceEnabled && !String.IsNullOrEmpty(address.StateProvinceName))
+                            {
+                                addressLine += ", " + address.StateProvinceName;
+                            }
+                            if (address.ZipPostalCodeEnabled && !String.IsNullOrEmpty(address.ZipPostalCode))
+                            {
+                                addressLine += " " + address.ZipPostalCode;
+                            }
+                            if (address.CountryEnabled && !String.IsNullOrWhiteSpace(address.CountryName))
+                            {
+                                addressLine += ", " + address.CountryName;
+                            }
+                            <option value="@(address.Id)">@(addressLine)</option>
+                        }
+                    </select>
+                </td>
+            </tr>
+         }
+        <tr>
+            <td>
+                @Html.NopLabelFor(model => model.BillingAddress.FirstName):
+			    @Html.RequiredHint()
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.BillingAddress.FirstName, new {autocomplete = "off"})
+                <div>@Html.ValidationMessageFor(model => model.BillingAddress.FirstName)</div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.NopLabelFor(model => model.BillingAddress.LastName):
+			    @Html.RequiredHint()
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.BillingAddress.LastName, new {autocomplete = "off"})
+                <div>@Html.ValidationMessageFor(model => model.BillingAddress.LastName)</div>
+            </td>
+        </tr>
+        @if (Model.BillingAddress.PhoneEnabled)
+        {
+            <tr>
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.PhoneNumber):
+                    @if (Model.BillingAddress.PhoneRequired)
+                    {
+                        @Html.RequiredHint()
+                    }
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.PhoneNumber, new {autocomplete = "off"})
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.PhoneNumber)</div>
+                </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.FaxEnabled)
+        {
+            <tr>
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.FaxNumber):
+                    @if (Model.BillingAddress.FaxRequired)
+                    {
+                        @Html.RequiredHint()
+                    }
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.FaxNumber, new {autocomplete = "off"})
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.FaxNumber)</div>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                @Html.NopLabelFor(model => model.BillingAddress.Email):@Html.RequiredHint()
+            </td>
+            <td>
+                @Html.TextBoxFor(model => model.BillingAddress.Email, new {autocomplete = "off"})
+                <div>@Html.ValidationMessageFor(model => model.BillingAddress.Email)</div>
+            </td>
+        </tr>
+        @if (Model.BillingAddress.CompanyEnabled)
+        {
+            <tr>
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.Company):
+                    @if (Model.BillingAddress.CompanyRequired)
+                    {
+                        @Html.RequiredHint()
+                    }
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.Company, new {autocomplete = "off"})
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.Company)</div>
+                </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.CountryEnabled)
+        {
+            <tr id="record-address-country">
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.CountryId):
+                    @Html.RequiredHint()
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.BillingAddress.CountryId, Model.BillingAddress.AvailableCountries, new {autocomplete = "off"})
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.CountryId)</div>
+                </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.CountryEnabled && Model.BillingAddress.StateProvinceEnabled)
+        {
+            <tr id="record-address-stateprovince">
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.StateProvinceId):
+                    @Html.RequiredHint()
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.BillingAddress.StateProvinceId, Model.BillingAddress.AvailableStates, new {autocomplete = "off"})
+                    <span id="billingstates-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.AvailableStates)</div>
+                </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.CityEnabled)
+        {
+            <tr id="record-address-city">
+               <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.City):
+                    @if (Model.BillingAddress.CityRequired)
+                    {
+                         @Html.RequiredHint()
+                    }
+               </td>
+               <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.City, new {autocomplete = "off"})
+                    <div>@Html.ValidationMessageFor(model => model.BillingAddress.City)</div>
+               </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.StreetAddressEnabled)
+        {
+            <tr id="record-address-streetaddress">
+                <td>
+                    @Html.NopLabelFor(model => model.BillingAddress.Address1):
+                    @if (Model.BillingAddress.StreetAddressRequired)
+                    {
+                       @Html.RequiredHint()
+                    }
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.Address1, new {autocomplete = "off"})
+                    <br>
+                    @Html.ValidationMessageFor(model => model.BillingAddress.Address1)
+                </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.StreetAddress2Enabled)
+        {
+            <tr id="record-address-streetaddress2">
+                 <td>
+                      @Html.NopLabelFor(model => model.BillingAddress.Address2):
+                      @if (Model.BillingAddress.StreetAddress2Required)
+                      {
+                        @Html.RequiredHint()
+                      }
+                 </td>
+                 <td>
+                     @Html.TextBoxFor(model => model.BillingAddress.Address2, new {autocomplete = "off"})
+                     <br>
+                     @Html.ValidationMessageFor(model => model.BillingAddress.Address2)
+                 </td>
+            </tr>
+        }
+        @if (Model.BillingAddress.ZipPostalCodeEnabled)
+        {
+            <tr id="record-address-zippostalcode">
+                <td>
+                     @Html.NopLabelFor(model => model.BillingAddress.ZipPostalCode):
+                     @if (Model.BillingAddress.ZipPostalCodeRequired)
+                     {
+                         @Html.RequiredHint()
+                     }
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.BillingAddress.ZipPostalCode, new {autocomplete = "off"})
+                    <br>
+                    @Html.ValidationMessageFor(model => model.BillingAddress.ZipPostalCode)
+                </td>
+            </tr>
+        }
+    </table>
+    <div class="billing-address-window-buttons-bottom">
+        <input class="button-2 billing-address-window-button" type="button" onclick="saveBillingAddress()" value="@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Save")">
+        <input class="button-2 billing-address-window-button" type="button" onclick="cancelBillingAddress()" value="@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.BillingAddress.Window.Cancel")">
+    </div>
+</div> 
+</div>

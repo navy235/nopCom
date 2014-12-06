@@ -1,0 +1,34 @@
+﻿@{
+    Layout = "";
+}
+@model Nop.Plugin.Widgets.LoginBackground.Models.ConfigurationModel
+@using Nop.Web.Framework;
+@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend><strong>@T("Plugins.Widgets.LoginBackground.Picture")</strong></legend>
+        <table class="adminContent">
+            <tr>
+                <td class="adminTitle">
+                    @Html.OverrideStoreCheckboxFor(model => model.PictureId_OverrideForStore, model => model.PictureId, Model.ActiveStoreScopeConfiguration)
+                    @Html.NopLabelFor(model => model.PictureId):
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.PictureId)
+                    @Html.ValidationMessageFor(model => model.PictureId)
+                </td>
+            </tr>
+
+        </table>
+    </fieldset>
+   
+    <br />
+    <table class="adminContent">
+        <tr>
+            <td colspan="2">
+                <input type="submit" name="save" class="k-button" value="@T("Admin.Common.Save")" />
+            </td>
+        </tr>
+    </table>
+}

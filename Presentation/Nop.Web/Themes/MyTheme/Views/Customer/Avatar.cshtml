@@ -1,0 +1,70 @@
+﻿@model CustomerAvatarModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Partial("MyAccountNavigation", Model.NavigationModel, new ViewDataDictionary())
+}
+
+@section  bread{
+    <div class="breadcrumbs">
+        <a href="@Url.RouteUrl("CustomerInfo")" >@T("Account.MyAccount") </a>
+        &nbsp;&gt;&nbsp; @T("Account.Avatar")
+    </div>
+}
+
+
+<div class="order-list">
+
+    @using (Html.BeginRouteForm("CustomerAvatar", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+
+        if (!Model.Success)
+        {
+        <div class="form-result-tips">
+            <i class="icon-help"></i>
+            @Html.ValidationSummary(true)
+            <a href="javascript:void(0);" onclick="$(this).parent().hide()"><i class="icon-help-close"></i></a>
+        </div>
+        }
+        
+        <div class="form-container bordered">
+            <div class="form-header">
+                <h3 class="bg">@T("Account.Avatar")</h3>
+            </div>
+
+            <div class="form-fields">
+                <div class="form-group form-group-image clearfix">
+                    @{
+        var imageUrl = Url.Content("~/Themes/Mytheme/Content/css/images/noimages.gif");
+        if (!String.IsNullOrEmpty(Model.AvatarUrl))
+        {
+            imageUrl = Model.AvatarUrl;
+        }
+                    }
+                    <div class="form-image">
+                        <img src="@imageUrl" alt="avatar" />
+                    </div>
+                    <input name="uploadedFile" class="ui-upload" type="file" />
+                    <div class="form-group-hint">
+                        @T("Account.Avatar.UploadRules")
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-submit">
+                <input type="submit" name="upload-avatar" class="ui-button primary huge" value="@T("Common.Upload")" />
+                @if (!String.IsNullOrEmpty(Model.AvatarUrl))
+                {
+                    <input type="submit" name="remove-avatar" class="ui-button primary huge" value="@T("Account.Avatar.RemoveAvatar")" />
+                }
+            </div>
+        </div>
+
+    }
+</div>

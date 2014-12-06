@@ -1,0 +1,10 @@
+﻿@model CheckoutPaymentInfoModel
+@using Nop.Web.Models.Checkout;
+@{
+    Layout = "";
+}
+<div class="section payment-info">
+   <div class="info">
+       @Html.Action(Model.PaymentInfoActionName, Model.PaymentInfoControllerName, Model.PaymentInfoRouteValues)
+   </div>
+</div>

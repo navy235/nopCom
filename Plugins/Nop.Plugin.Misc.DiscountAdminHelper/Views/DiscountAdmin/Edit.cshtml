@@ -1,0 +1,23 @@
+﻿@model Nop.Admin.Models.Discounts.DiscountModel
+@using Nop.Web.Framework;
+@{
+    //page title
+    ViewBag.Title = T("Admin.Promotions.Discounts.EditDiscountDetails").Text;
+    Layout = "~/Administration/Views/Shared/_AdminLayout.cshtml";
+}
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+        <img src="@Url.Content("~/Administration/Content/images/ico-promotions.png")" alt="" />
+            @T("Admin.Promotions.Discounts.EditDiscountDetails") - @Model.Name @Html.ActionLink("(" + T("Admin.Promotions.Discounts.BackToList") + ")", "List")
+        </div>
+        <div class="options">
+            <input type="submit" name="save" class="k-button" value="@T("Admin.Common.Save")" />
+            <input type="submit" name="save-continue" class="k-button" value="@T("Admin.Common.SaveContinue")" />
+            <span id="discount-delete" class="k-button">@T("Admin.Common.Delete")</span>
+        </div>
+    </div>
+    @Html.Partial("~/Plugins/Misc.DiscountAdminHelper/Views/DiscountAdmin/_CreateOrUpdate.cshtml", Model)
+}
+@Html.DeleteConfirmation("discount-delete")

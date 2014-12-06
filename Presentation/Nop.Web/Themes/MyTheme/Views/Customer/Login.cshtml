@@ -1,0 +1,137 @@
+﻿@model LoginModel
+@using Nop.Web.Models.Customer;
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@{
+    Layout = "~/Views/Shared/_Head.Login.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Login").Text);
+
+    //register URL with return URL (if specified)
+    var registerUrl = Url.RouteUrl("Register");
+    if (!String.IsNullOrEmpty(this.Context.Request.QueryString["returnUrl"]))
+    {
+        var webHelper = EngineContext.Current.Resolve<IWebHelper>();
+        registerUrl = webHelper.ModifyQueryString(registerUrl, "returnurl=" + HttpUtility.UrlEncode(this.Context.Request.QueryString["returnUrl"]), null);
+    }
+}
+
+
+<div class="login-form">
+    <div class="login-header-tip">
+        <span class="fl">@T("Account.Login.Welcome")</span>
+
+    </div>
+
+    @Html.Partial("_ExternalAuthentication.AssociateMessage")
+    @Html.Partial("_ExternalAuthentication.Errors")
+
+
+
+
+    @using (Html.BeginForm())
+    {
+        <div class="text-danger">
+            @Html.ValidationSummary(true, T("Account.Login.Unsuccessful").Text)
+        </div>
+        if (Model.UsernamesEnabled)
+        {
+            
+        <p class="inputs">
+            @Html.TextBoxFor(model => model.Username, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.Username, new { @class = "" })
+
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.Username)</span>
+        </p>
+      
+        }
+        else
+        {
+        <p class="inputs">
+            @Html.TextBoxFor(model => model.Email, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.Email, new { @class = "" })
+
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.Email)</span>
+        </p>
+        
+        }
+        
+        <p class="inputs">
+            @Html.PasswordFor(model => model.Password, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.Password, new { @class = "" })
+
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.Password)</span>
+        </p>
+        
+        <p class="mb50 clear mr70 lh14">
+            <span class="fl remmber f12">
+                <span class="checkbox">
+                    <input type="checkbox" name="RememberMe" class="hide" value="@Model.RememberMe" />
+
+                    <i></i>@T("Account.Login.Fields.RememberMe")</span>
+            </span>
+
+            <span class="fr f12">
+                @Html.RouteLink(T("Account.Login.ForgotPassword").Text, "PasswordRecovery", null, new { @class = "f12 coffee", target = "_blank" })
+                <span class="lgray f12">|</span>
+                <a href="@Url.RouteUrl("register")" class="regLink">@T("Account.Register")</a></span>
+        </p>
+        
+     
+        if (Model.DisplayCaptcha)
+        {
+        <div class="captcha-box">
+            @Html.Raw(Html.GenerateCaptcha())
+        </div>
+        }
+        <div class="buttons">
+            <input class="button-1 login-button btn btn-primary " type="submit" value="@T("Account.Login.LoginButton")" />
+        </div>
+                       
+    }
+</div>
+
+<div class="custom-page-box-div">
+    @Html.Action("ExternalMethods", "ExternalAuthentication")
+</div>
+
+@*<div class="row">
+    <div class="col-md-12">
+        @Html.Action("TopicBlock", "Topic", new { systemName = "LoginRegistrationInfo" })
+    </div>
+</div>*@
+
+<script type="text/javascript">
+    $(function () {
+        $('.inputs > input.ipt').on('focus', function () {
+            $(this).next('label').addClass('hide');
+        })
+        $('.inputs > input.ipt').on('blur', function () {
+            if ($(this).val() == '') {
+                $(this).next('label').removeClass('hide');
+            }
+        })
+
+        $('.checkbox').click(function () {
+            var checkbox = $(this).find('input[type="checkbox"]');
+            if (checkbox.val() == 'true') {
+                checkbox.val('false');
+                $(this).find('i').removeClass('checked');
+            } else {
+                checkbox.val('true');
+                $(this).find('i').addClass('checked');
+            }
+        })
+
+    })
+</script>

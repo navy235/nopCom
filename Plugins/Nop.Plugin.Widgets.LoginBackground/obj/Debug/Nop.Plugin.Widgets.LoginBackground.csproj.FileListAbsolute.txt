@@ -1,0 +1,10 @@
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Content\images\login-bg.jpg
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Description.txt
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Views\WidgetsLoginBackground\Configure.cshtml
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Nop.Plugin.Widgets.LoginBackground.dll
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Nop.Plugin.Widgets.LoginBackground.pdb
+D:\Nop\Plugins\Nop.Plugin.Widgets.LoginBackground\obj\Debug\Nop.Plugin.Widgets.LoginBackground.csprojResolveAssemblyReference.cache
+D:\Nop\Plugins\Nop.Plugin.Widgets.LoginBackground\obj\Debug\Nop.Plugin.Widgets.LoginBackground.dll
+D:\Nop\Plugins\Nop.Plugin.Widgets.LoginBackground\obj\Debug\Nop.Plugin.Widgets.LoginBackground.pdb
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\logo.jpg
+D:\Nop\Presentation\Nop.Web\Plugins\Widgets.LoginBackground\Views\WidgetsLoginBackground\PublicInfo.cshtml

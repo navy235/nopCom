@@ -1,0 +1,6 @@
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.TwoCheckout\Description.txt
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.TwoCheckout\Nop.Plugin.Payments.TwoCheckout.dll
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.TwoCheckout\Nop.Plugin.Payments.TwoCheckout.pdb
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.TwoCheckout\obj\Release\ResolveAssemblyReference.cache
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.TwoCheckout\obj\Release\Nop.Plugin.Payments.TwoCheckout.dll
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.TwoCheckout\obj\Release\Nop.Plugin.Payments.TwoCheckout.pdb

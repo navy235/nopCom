@@ -1,0 +1,212 @@
+﻿@model Nop.Plugin.Misc.DiscountAdminHelper.Models.DiscountListModel
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Framework;
+@{
+    var gridPageSize = EngineContext.Current.Resolve<Nop.Core.Domain.Common.AdminAreaSettings>().DefaultGridPageSize;
+    Layout = "~/Administration/Views/Shared/_AdminLayout.cshtml";
+    //page title
+    ViewBag.Title = T("Admin.Promotions.Discounts").Text;
+}
+
+@using (Html.BeginForm())
+{
+    <div class="section-header">
+        <div class="title">
+            <img src="@Url.Content("~/Administration/Content/images/ico-promotions.png")" alt="" />
+            @T("Admin.Promotions.Discounts")
+        </div>
+        <div class="options">
+            <a href="@Url.Action("Create")" class="k-button">@T("Admin.Common.AddNew")</a>
+        </div>
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.Name):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.Name)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.CouponCode):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.CouponCode)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.StartDate):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.StartDate)
+            </td>
+        </tr>
+        <tr>
+            <td class="adminTitle">
+                @Html.NopLabelFor(model => model.EndDate):
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => Model.EndDate)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" id="btnSearch" class="k-button" value="@T("Admin.Common.Search")" />
+            </td>
+        </tr>
+    </table>
+    <p>
+    </p>
+
+    <table class="adminContent">
+        <tr>
+            <td>
+                <div id="discounts-grid"></div>
+
+                <script>
+                    $(document).ready(function () {
+                        $("#discounts-grid").kendoGrid({
+                            dataSource: {
+                                type: "json",
+                                transport: {
+                                    read: {
+                                        url: "/Admin/Discount/List",
+                                        type: "POST",
+                                        dataType: "json",
+                                        data: additionalData
+                                    }
+                                },
+                                schema: {
+                                    data: "Data",
+                                    total: "Total",
+                                    errors: "Errors"
+                                },
+                                error: function(e) {
+                                    display_kendoui_grid_error(e);
+                                    // Cancel the changes
+                                    this.cancelChanges();
+                                },
+                                pageSize: @(gridPageSize),
+                                serverPaging: true,
+                                serverFiltering: true,
+                                serverSorting: true
+                            },
+                            pageable: {
+                                refresh: true
+                            },
+                            editable: {
+                                confirmation: false,
+                                mode: "inline"
+                            },
+                            scrollable: false,
+                            dataBound: onDataBound,
+                            columns: [{
+                                field: "DiscountModel.Name",
+                                title: "@T("Admin.Promotions.Discounts.Fields.Name")",
+                                width: 350
+                            },
+                            {
+                                field: "DiscountModel.CouponCode",
+                                title: "@T("Admin.Promotions.Discounts.Fields.CouponCode")",
+                                width: 350
+                            },
+                            {
+                                field: "Revenue",
+                                title: "@T("Admin.Promotions.Discounts.Fields.Revenue")",
+                                width: 350
+                            },
+                            {
+                                field: "Count",
+                                title: "@T("Admin.Promotions.Discounts.Fields.Count")",
+                                width: 350
+                            },
+                            {
+                                field: "DiscountModel.DiscountAmount",
+                                title: "@T("Admin.Promotions.Discounts.Fields.Discount")",
+                                width: 200,
+                                template: '# if(DiscountModel.UsePercentage) {# #=DiscountModel.DiscountPercentage# % #} else {#  #=DiscountModel.DiscountAmount# #=DiscountModel.PrimaryStoreCurrencyCode# #} #'
+                            }, {
+                                field: "StartDateUtc",
+                                title: "@T("Admin.Promotions.Discounts.Fields.StartDate")",
+                                width: 200,
+                                type: "date",
+                                format: "{0:G}"
+                            }, {
+                                field: "EndDateUtc",
+                                title: "@T("Admin.Promotions.Discounts.Fields.EndDate")",
+                                width: 200,
+                                type: "date",
+                                format: "{0:G}"
+                            }, {
+                                field: "DiscountModel.Id",
+                                title: "@T("Admin.Common.Edit")",
+                                width: 100,
+                                template: '<a href="Edit/#=DiscountModel.Id#">@T("Admin.Common.Edit")</a>'
+                            }]
+                        });
+                    });
+                </script>
+                <script type="text/javascript">
+
+                    $(document).ready(function () {
+
+                        //search button
+                        $('#btnSearch').click(function () {
+                            //search
+                            var grid = $('#discounts-grid').data('kendoGrid');
+                            grid.dataSource.page(1); //new search. Set page size to 1
+                            grid.dataSource.read();
+                            return false;
+                        });
+
+                        $("#@Html.FieldIdFor(model => model.Name)").keydown(function (event) {
+                            if (event.keyCode == 13) {
+                                $("#btnSearch").click();
+                                return false;
+                            }
+                        });
+                        $("#@Html.FieldIdFor(model => model.CouponCode)").keydown(function (event) {
+                            if (event.keyCode == 13) {
+                                $("#btnSearch").click();
+                                return false;
+                            }
+                        });
+
+                        $("#@Html.FieldIdFor(model => model.StartDate)").keydown(function (event) {
+                            if (event.keyCode == 13) {
+                                $("#btnSearch").click();
+                                return false;
+                            }
+                        });
+
+                        $("#@Html.FieldIdFor(model => model.EndDate)").keydown(function (event) {
+                            if (event.keyCode == 13) {
+                                $("#btnSearch").click();
+                                return false;
+                            }
+                        });
+
+                    });
+
+                    function additionalData() {
+                        return {
+                            Name: $('#@Html.FieldIdFor(model => model.Name)').val(),
+                            CouponCode: $('#@Html.FieldIdFor(model => model.CouponCode)').val(),
+                            StartDate: $('#@Html.FieldIdFor(model => model.StartDate)').val(),
+                            EndDate: $('#@Html.FieldIdFor(model => model.EndDate)').val()
+                        };
+                    }
+
+                    function onDataBound(e) {
+
+                    }
+
+                </script>
+            </td>
+        </tr>
+    </table>
+}

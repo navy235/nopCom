@@ -1,0 +1,125 @@
+﻿@model ProductDetailsModel.AddToCartModel
+@using Nop.Web.Models.Catalog;
+@using Nop.Core.Domain.Orders;
+
+@if (Model.UpdatedShoppingCartItemId > 0)
+{
+    @Html.HiddenFor(x => x.UpdatedShoppingCartItemId)
+}
+@if (Model.CustomerEntersPrice)
+{
+    <div class="customer-entered-price">
+        <div class="price-input form-group row">
+            <div class="col-md-6 paddding-right0">
+                @Html.LabelFor(model => model.CustomerEnteredPrice, new { @class = "enter-price-label" }, ":")
+                @*round price*@
+            </div>
+            <div class="col-md-4 paddding-left0">
+                @Html.TextBox("CustomerEnteredPrice", Convert.ToInt32(Math.Ceiling(Model.CustomerEnteredPrice)), new { @class = "enter-price-input, form-control" })
+            </div>
+        </div>
+        <div class="price-range form-group row">
+            <div class="col-md-12 text-info">
+                <strong>@Model.CustomerEnteredPriceRange</strong>
+            </div>
+        </div>
+    </div>
+}
+@if (!Model.DisableBuyButton || !Model.DisableWishlistButton)
+{
+    <dl class="pro-manu pro-attr-dl clearfix">
+
+        <dt class="pro-attr-title">@T("Products.Qty")：</dt>
+
+
+        @if (Model.AllowedQuantities.Count > 0)
+        {
+            <div class="col-md-3 form-two">
+                <form>@Html.DropDownListFor(model => model.EnteredQuantity, Model.AllowedQuantities, new { @class = "qty-dropdown" })    </form>
+            </div>
+        }
+        else
+        {
+            <dd >
+                <div class="num-container">
+                    <span data-direction="reduce" class="num-reduce num-handle disabled"></span>
+                    <em class="num-input">1</em>
+                    @Html.TextBoxFor(model => model.EnteredQuantity, new { @class = "qty-input", type = "hidden" })
+                    <span data-direction="add" class="num-add  num-handle"></span>
+                </div>
+            </dd>
+                  
+
+            //when a customer clicks 'Enter' button we submit the "add to cart" button (if visible)
+            if (!Model.DisableBuyButton)
+            {
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    var controlId = "@Html.FieldIdFor(model => model.EnteredQuantity)";
+                    $('.num-handle').on('click', function (e) {
+                        var target = $(e.currentTarget);
+                        var direction = target.data('direction');
+                        var btnadd = $('.num-add');
+                        var btnreduce = $('.num-reduce');
+                        var currentValue = $('#' + controlId).val();
+                        if (target.hasClass('disabled')) {
+                            return false;
+                        } else {
+                            if (direction == "add") {
+                                currentValue++;
+                            } else {
+                                currentValue--;
+                            }
+                        }
+                        if (currentValue == 1) {
+                            btnreduce.addClass('disabled');
+                        } else {
+                            btnreduce.removeClass('disabled');
+                        }
+                        $('#' + controlId).val(currentValue);
+                        $('.num-input').text(currentValue);
+                    })
+                });
+            </script>
+            }
+
+        }
+
+    </dl>
+    
+    
+    <dl class="pro-manu pro-attr-dl clearfix">
+        <dt class="pro-attr-title">&nbsp;</dt>
+        <dd class="pro-attr-content">
+            @if (!Model.DisableBuyButton)
+            {
+
+                var addToCartText = "";
+                if (Model.UpdatedShoppingCartItemId > 0)
+                {
+                    addToCartText = T("ShoppingCart.AddToCart.Update").Text;
+                }
+                else
+                {
+                    addToCartText = Model.AvailableForPreOrder ? T("ShoppingCart.PreOrder").Text : T("ShoppingCart.AddToCart").Text;
+                }
+           
+                <button type="button" id="add-to-cart-button-@Model.ProductId" class="btn-cart add-to-cart-button" data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart })', '#product-details-form');return false;">
+                    @addToCartText
+                </button>
+           
+            }
+
+            @if (!Model.DisableWishlistButton && Model.UpdatedShoppingCartItemId == 0)
+            {
+           
+                <button type="button" id="add-to-wishlist-button-@Model.ProductId" class="btn-wishlist add-to-wishlist-button " data-productid="@Model.ProductId" onclick="AjaxCart.addproducttocart_details('@Url.RouteUrl("AddProductToCart-Details", new { productId = Model.ProductId, shoppingCartTypeId = (int)ShoppingCartType.Wishlist })', '#product-details-form');return false;">@T("ShoppingCart.AddToWishlist") </button>
+            
+            }
+        </dd>
+    </dl>
+}
+@Html.Widget("productdetails_add_info")
+
+
+

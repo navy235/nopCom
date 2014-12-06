@@ -1,0 +1,241 @@
+﻿@using Nop.Core.Infrastructure;
+@using Nop.Services.Catalog;
+@using Nop.Core;
+@using Nop.Core.Domain.Catalog;
+@using Nop.Services.Seo;
+@using Nop.Core.Domain.Media;
+@using Nop.Services.Media;
+@using Nop.Services.Security;
+@using Nop.Services.Localization;
+@using Nop.Services.Tax;
+@using Nop.Services.Directory;
+@using System.Diagnostics;
+@using Nop.Core.Domain.Tax;
+@using Nop.Core.Domain.Orders;
+
+@{
+    var _productService = EngineContext.Current.Resolve<IProductService>();
+    var _workContext = EngineContext.Current.Resolve<IWorkContext>();
+    var _storeContext = EngineContext.Current.Resolve<IStoreContext>();
+    var _taxService = EngineContext.Current.Resolve<ITaxService>();
+    var _currencyService = EngineContext.Current.Resolve<ICurrencyService>();
+    var _pictureService = EngineContext.Current.Resolve<IPictureService>();
+    var _localizationService = EngineContext.Current.Resolve<ILocalizationService>();
+    var _priceCalculationService = EngineContext.Current.Resolve<IPriceCalculationService>();
+    var _priceFormatter = EngineContext.Current.Resolve<IPriceFormatter>();
+    var _mediaSettings = EngineContext.Current.Resolve<MediaSettings>();
+    var _catalogSettings = EngineContext.Current.Resolve<CatalogSettings>();
+    var _permissionService = EngineContext.Current.Resolve<IPermissionService>();
+
+    var products = _productService.SearchProducts(
+                    storeId: _storeContext.CurrentStore.Id,
+                       visibleIndividuallyOnly: true,
+                    orderBy: ProductSortingEnum.CreatedOn,
+                    pageSize: _catalogSettings.RecentlyAddedProductsNumber);
+                    
+    int pictureSize = _mediaSettings.ProductThumbPictureSize;
+
+	<div class="product-grid home-page-product-grid">
+    @foreach (var product in products)
+    {
+        string SeName = product.GetSeName();
+        var picture = _pictureService.GetPicturesByProductId(product.Id, 1).FirstOrDefault();
+        string ImageUrl = _pictureService.GetPictureUrl(picture, pictureSize);
+        string oldPriceText = "";
+        string priceText = "";
+
+        //prepare "Add to cart" AJAX link
+        string addtocartlink = "";
+        var shoppingCartTypeId = (int)ShoppingCartType.ShoppingCart;
+        var quantity = 1;
+        addtocartlink = Url.RouteUrl("AddProductToCart-Catalog", new { productId = product.Id, shoppingCartTypeId = shoppingCartTypeId, quantity = quantity, });
+        
+	<div class="item-box col-md-3 col-sm-6 col-xs-12">
+	<div class="product-item">
+        <div class="product-title">
+            <a href="@Url.RouteUrl("Product", new { SeName = SeName })">@product.Name</a>
+        </div>
+        <div class="picture">
+            <a href="@Url.RouteUrl("Product", new { SeName = SeName })" title="@product.Name">
+                <img alt="@product.Name" class="img-responsive" src="@ImageUrl" title="@product.Name" />
+            </a>
+        </div>
+        <div class="clear"></div>
+        <div class="details">
+            <div class="description">
+                @Html.Raw(product.ShortDescription)
+            </div>
+            <div class="add-info">
+                <div class="prices">
+                    @switch (product.ProductType)
+                    {
+                        case ProductType.GroupedProduct:
+                            {
+                                #region Grouped product
+
+                                var associatedProducts = _productService.SearchProducts(
+                                    storeId: _storeContext.CurrentStore.Id,
+                                    visibleIndividuallyOnly: false,
+                                    parentGroupedProductId: product.Id);
+
+                                switch (associatedProducts.Count)
+                                {
+                                    case 0:
+                                        {
+
+                                        }
+                                        break;
+                                    default:
+                                        {
+                                            if (_permissionService.Authorize(StandardPermissionProvider.DisplayPrices))
+                                            {
+                                                //find a minimum possible price
+                                                decimal? minPossiblePrice = null;
+                                                Product minPriceProduct = null;
+                                                foreach (var associatedProduct in associatedProducts)
+                                                {
+                                                    //calculate for the maximum quantity (in case if we have tier prices)
+                                                    var tmpPrice = _priceCalculationService.GetFinalPrice(associatedProduct,
+                                                        _workContext.CurrentCustomer, decimal.Zero, true, int.MaxValue);
+                                                    if (!minPossiblePrice.HasValue || tmpPrice < minPossiblePrice.Value)
+                                                    {
+                                                        minPriceProduct = associatedProduct;
+                                                        minPossiblePrice = tmpPrice;
+                                                    }
+                                                }
+                                                if (minPriceProduct != null && !minPriceProduct.CustomerEntersPrice)
+                                                {
+                                                    if (minPriceProduct.CallForPrice)
+                                                    {
+                                                        oldPriceText = "";
+                                                        priceText = _localizationService.GetResource("Products.CallForPrice");
+                                                    }
+                                                    else if (minPossiblePrice.HasValue)
+                                                    {
+                                                        //calculate prices
+                                                        decimal taxRate = decimal.Zero;
+                                                        decimal finalPriceBase = _taxService.GetProductPrice(minPriceProduct, minPossiblePrice.Value, out taxRate);
+                                                        decimal finalPrice = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceBase, _workContext.WorkingCurrency);
+
+                                                        oldPriceText = "";
+                                                        priceText = String.Format(_localizationService.GetResource("Products.PriceRangeFrom"), _priceFormatter.FormatPrice(finalPrice));
+                                                        
+                                                    }
+                                                    else
+                                                    {
+                                                        //Actually it's not possible (we presume that minimalPrice always has a value)
+                                                        //We never should get here
+                                                        Debug.WriteLine(string.Format("Cannot calculate minPrice for product #{0}", product.Id));
+                                                    }
+                                                }
+                                            }
+                                            else
+                                            {
+                                                //hide prices
+                                                oldPriceText="";
+                                                priceText = "";
+                                            }
+                                        }
+                                        break;
+                                }
+
+                                #endregion
+                            }
+                            break;
+                        case ProductType.SimpleProduct:
+                        default:
+                            {
+                                #region Simple product
+
+                                //prices
+                                if (_permissionService.Authorize(StandardPermissionProvider.DisplayPrices))
+                                {
+                                    //calculate for the maximum quantity (in case if we have tier prices)
+                                    decimal minPossiblePrice = _priceCalculationService.GetFinalPrice(product,
+                                        _workContext.CurrentCustomer, decimal.Zero, true, int.MaxValue);
+                                    if (!product.CustomerEntersPrice)
+                                    {
+                                        if (product.CallForPrice)
+                                        {
+                                            //call for price
+                                            oldPriceText = null;
+                                            priceText = _localizationService.GetResource("Products.CallForPrice");
+                                        }
+                                        else
+                                        {
+                                            //calculate prices
+                                            decimal taxRate = decimal.Zero;
+                                            decimal oldPriceBase = _taxService.GetProductPrice(product, product.OldPrice, out taxRate);
+                                            decimal finalPriceBase = _taxService.GetProductPrice(product, minPossiblePrice, out taxRate);
+
+                                            decimal oldPrice = _currencyService.ConvertFromPrimaryStoreCurrency(oldPriceBase, _workContext.WorkingCurrency);
+                                            decimal finalPrice = _currencyService.ConvertFromPrimaryStoreCurrency(finalPriceBase, _workContext.WorkingCurrency);
+
+                                            //do we have tier prices configured?
+                                            var tierPrices = new List<TierPrice>();
+                                            if (product.HasTierPrices)
+                                            {
+                                                tierPrices.AddRange(product.TierPrices
+                                                    .OrderBy(tp => tp.Quantity)
+                                                    .ToList()
+                                                    .FilterByStore(_storeContext.CurrentStore.Id)
+                                                    .FilterForCustomer(_workContext.CurrentCustomer)
+                                                    .RemoveDuplicatedQuantities());
+                                            }
+                                            //When there is just one tier (with  qty 1), 
+                                            //there are no actual savings in the list.
+                                            bool displayFromMessage = tierPrices.Count > 0 && 
+                                                !(tierPrices.Count == 1 && tierPrices[0].Quantity <= 1);
+                                            if (displayFromMessage)
+                                            {
+                                                oldPriceText = "";
+                                                priceText = String.Format(_localizationService.GetResource("Products.PriceRangeFrom"), _priceFormatter.FormatPrice(finalPrice));
+                                            }
+                                            else
+                                            {
+                                                if (finalPriceBase != oldPriceBase && oldPriceBase != decimal.Zero)
+                                                {
+                                                    oldPriceText = _priceFormatter.FormatPrice(oldPrice);
+                                                    priceText = _priceFormatter.FormatPrice(finalPrice);
+                                                }
+                                                else
+                                                {
+                                                    oldPriceText = null;
+                                                    priceText = _priceFormatter.FormatPrice(finalPrice);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    //hide prices
+                                    oldPriceText = null;
+                                    priceText = null;
+                                }
+
+                                #endregion
+                            }
+                            break;
+                    }
+
+                    @if (!String.IsNullOrEmpty(oldPriceText))
+                    {
+                        <span class="price old-price">@oldPriceText</span>
+                    }
+                    <span class="price actual-price">@priceText</span>
+                </div>
+                <div class="buttons">
+                    @*<input type="button" value="@T("Products.Details")" class="button-1 product-box-detail-button" onclick="setLocation('@Url.RouteUrl("Product", new { SeName = SeName })')" />*@
+                    <input type="button" value="BUY" class="product-box-add-to-cart-button" onclick="AjaxCart.addproducttocart_catalog('@addtocartlink');return false;" />
+                </div>
+                @Html.Widget("productbox_add_info")
+            </div>
+        </div>
+
+        <div class="clear"></div>
+	</div>
+    </div>
+    }
+	</div>
+}

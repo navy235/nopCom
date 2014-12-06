@@ -1,0 +1,134 @@
+﻿@model ProductDetailsModel
+@using Nop.Core.Domain.Seo;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Catalog;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    Html.AppendScriptParts("~/Themes/MyTheme/Scripts/jquery.tabs.js");
+    //title, meta
+    Html.AddTitleParts(!String.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name);
+    Html.AddMetaDescriptionParts(Model.MetaDescription);
+    Html.AddMetaKeywordParts(Model.MetaKeywords);
+
+    var canonicalUrlsEnabled = EngineContext.Current.Resolve<SeoSettings>().CanonicalUrlsEnabled;
+    if (canonicalUrlsEnabled)
+    {
+        var productUrl = Url.RouteUrl("Product", new { SeName = Model.SeName }, this.Request.Url.Scheme);
+        Html.AddCanonicalUrlParts(productUrl);
+    }
+}
+<!--product breadcrumb-->
+<div class="product-container clearfix">
+    @Html.Action("ProductBreadcrumb", "Catalog", new { productId = Model.Id })
+
+    <div class="product-top">
+        <div class="pic-container">
+            @Html.Widget("productdetails_before_pictures")
+            @Html.Partial("_ProductDetailsPictures", Model)
+            @Html.Widget("productdetails_after_pictures")
+        </div>
+
+        <div class="pro-details">
+            <div class="pro-title-box clearfix">
+                <!--product manufacturers-->
+                @Html.Action("ProductManufacturers", "Catalog", new { productId = Model.Id })
+                <div class="pro-title">
+                    <p class="pro-title-detail">@Model.Name</p>
+                </div>
+            </div>
+            @using (Html.BeginRouteForm("Product", new { SeName = Model.SeName }, FormMethod.Post, new { id = "product-details-form" }))
+            {
+
+                var dataDictPrice = new ViewDataDictionary();
+                dataDictPrice.TemplateInfo.HtmlFieldPrefix = string.Format("price_{0}", Model.Id);
+     
+                <div class="prices pro-price-box ">
+                    @Html.Partial("_ProductPrice", Model.ProductPrice, dataDictPrice)
+                </div>
+    
+
+      
+          
+                <!--Back in stock subscription-->
+                @Html.Partial("_BackInStockSubscription", Model)
+          
+
+                <!--sample download-->
+                @Html.Partial("_DownloadSample", Model)
+
+
+                <!--attributes-->
+   
+                var dataDictAttributes = new ViewDataDictionary();
+                dataDictAttributes.TemplateInfo.HtmlFieldPrefix = string.Format("attributes_{0}", Model.Id);
+                @Html.Partial("_ProductAttributes", Model.ProductVariantAttributes, dataDictAttributes)                  
+    
+                <!--product SKU, manufacturer part number, stock info-->
+                @Html.Partial("_SKU_Man_Stock", Model)
+
+                var dataDictAddToCart = new ViewDataDictionary();
+                dataDictAddToCart.TemplateInfo.HtmlFieldPrefix = string.Format("addtocart_{0}", Model.Id);
+    
+            
+                <div class="pro-cart">
+                    @Html.Partial("_AddToCart", Model.AddToCart, dataDictAddToCart)
+                </div>
+            
+            
+            
+                <!--gift card-->
+
+                var dataDictGiftCard = new ViewDataDictionary();
+                dataDictGiftCard.TemplateInfo.HtmlFieldPrefix = string.Format("giftcard_{0}", Model.Id);
+                @Html.Partial("_GiftCardInfo", Model.GiftCard, dataDictGiftCard)
+
+             
+       
+                <!--email adn compare-->
+@*   @Html.Action("ProductEmailAFriendButton", "Catalog", new { productId = Model.Id })
+
+                @Html.Action("CompareProductsButton", "Catalog", new { productId = Model.Id })
+
+          
+
+            Html.Action("ShareButton", "Catalog")*@
+
+                @Html.Action("ProductTierPrices", "Catalog", new { productId = Model.Id })
+    
+      
+
+            }
+        </div>
+
+    </div>
+
+    <div class="pro-content">
+        <!--category-tab-->
+        <div class="pro-tab head-inner">
+            <ul class="pro-tab-list" data-role="tab">
+                <li class="selected"><a href="#description" data-toggle="tab">@T("Products.Description")</a></li>
+                <li><a href="#comments"  data-toggle="tab">@T("Products.Comment")</a></li>
+                <li><a href="#tags"  data-toggle="tab">@T("Products.Tags")</a></li>
+            </ul>
+        </div>
+        <div class="pro-tab-content">
+            <div class="selected pro-tab-item" id="description">
+                @Html.Action("ProductSpecifications", "Catalog", new { productId = Model.Id })
+                @Html.Raw(Model.FullDescription)
+            </div>
+            <div id="comments" class="pro-tab-item" style="display:none">
+              @Html.Action("ProductReviewList", "Catalog", new { productId = Model.Id })
+            </div>
+            <div id="tags" class="pro-tab-item" style="display:none">
+                @Html.Action("ProductTags", "Catalog", new { productId = Model.Id })
+            </div>
+            @T("Products.Promises")
+            @T("Products.State")
+        </div>
+    </div>
+    <div class="product-collateral">
+        @Html.Action("ProductsAlsoPurchased", "Catalog", new { productId = Model.Id })
+        @Html.Action("RelatedProducts", "Catalog", new { productId = Model.Id })
+    </div>
+</div>

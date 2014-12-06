@@ -1,0 +1,125 @@
+﻿@model ProductReviewsModel
+@using Nop.Web.Models.Catalog;
+@{
+ 
+    var score = (((double)Model.ReviewOverviewModel.RatingSum / (Model.ReviewOverviewModel.TotalReviews * 5)) * 5);
+}
+
+
+@helper GetStartCount(int star)
+{
+    
+    var count = Model.Items.Count(x => x.Rating == star);
+    
+    
+    <span data-count="@count" class="pro-r-count">(@count)</span>
+
+    
+}
+<div class="pro-revhd">
+    <div class="pro-r-summary clearfix">
+        <div class="pro-r-score">
+            <span>宝贝与描述相符</span>
+            <strong>@(score)</strong>
+            <span>分</span>
+        </div>
+        <div class="pro-r-count-num">共@(Model.ReviewOverviewModel.TotalReviews)次打分</div>
+    </div>
+    <div class="pro-r-box">
+        <div class="pro-r-filter">
+            <ul class="pro-taglist">
+                <li class="pro-taglist-li-current pro-taglist-li-1024" id="pro-taglist-first-li">
+                    <input id="reviews-t-0" type="radio" data-act="type" data-val="" checked="checked" name="reviews-type">
+                    <label for="reviews-t-0">
+                        <span class="r-c-title">全部</span>
+                    </label>
+                </li>
+
+                <li class="pro-taglist-li pro-taglist-li-2">
+                    <input id="reviews-t-1" type="radio" data-act="type" data-val="2" name="reviews-type">
+                    <label for="reviews-t-1">
+                        <span class="r-c-title">特差</span>
+                        @GetStartCount(1)
+                    </label>
+                </li>
+                <li class="pro-taglist-li pro-taglist-li-1">
+                    <input id="reviews-t-2" type="radio" data-act="type" data-val="1" name="reviews-type">
+                    <label for="reviews-t-2">
+                        <span class="r-c-title">差评</span>
+                        @GetStartCount(2)
+                    </label>
+                </li>
+                <li class="pro-taglist-li pro-taglist-li-0">
+                    <input id="reviews-t-3" type="radio" data-act="type" data-val="0" name="reviews-type">
+                    <label for="reviews-t-3">
+                        <span class="r-c-title">中评</span>
+                        @GetStartCount(3)
+                    </label>
+                </li>
+                <li class="pro-taglist-li pro-taglist-li-999">
+                    <input id="reviews-t-4" type="radio" data-act="type" data-val="-1" name="reviews-type">
+                    <label for="reviews-t-4">
+                        <span class="r-c-title">好评</span>
+                        @GetStartCount(4)
+                    </label>
+                </li>
+                <li class="pro-taglist-li pro-taglist-li-999">
+                    <input id="reviews-t-5" type="radio" data-act="type" data-val="-1" name="reviews-type">
+                    <label for="reviews-t-5">
+                        <span class="r-c-title">五星好评</span>
+                        @GetStartCount(5)
+                    </label>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@if (Model.Items.Count > 0)
+{
+               
+    <div class="pro-record">
+        <ul class="pro-r-comments">
+            @foreach (var review in Model.Items)
+            {
+                int ratingPercent = review.Rating * 20;
+                <li  class="pro-r-review clearfix" data-uid="@review.CustomerId">
+                    <div class="pro-r-buyer">
+                        <div class="pro-r-avatar">
+                            @if (review.AllowViewingProfiles)
+                            {
+                                <a href="@Url.RouteUrl("CustomerProfile", new { id = review.CustomerId })">@(review.CustomerName)</a>
+                            }
+                            else
+                            {
+                                @review.CustomerName
+                            }
+                        </div>
+                    </div>
+                    <div class="pro-r-bd">
+                        <div class="pro-rev-item " data-id="@review.Id">
+                            <div class="pro-r-cnt ">
+                                @Html.Raw(Nop.Core.Html.HtmlHelper.FormatText(review.ReviewText, false, true, false, false, false, false))
+                            </div>
+                            <div class="pro-r-act-bar">
+                                <div class="pro-r-info clearfix">
+                                    <span class="pro-r-date">@review.WrittenOnStr</span>
+                                    <span class="pro-r-sku">
+                                        <div class="rating ">
+                                            <div style="width: @(ratingPercent)%">
+                                            </div>
+                                        </div>
+                                    </span>
+                                </div>
+                                @Html.Partial("_ProductReviewHelpfulness", review.Helpfulness, new ViewDataDictionary())
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+
+}
+
+

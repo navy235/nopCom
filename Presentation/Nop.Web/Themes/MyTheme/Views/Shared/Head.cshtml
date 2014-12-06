@@ -1,0 +1,21 @@
+﻿@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Framework.UI
+@{
+    var supportRtl = EngineContext.Current.Resolve<IWorkContext>().WorkingLanguage.Rtl;
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/form.css");
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/main.css");
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/animate.css");
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/icon.css");
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/css/bootstrap.css");
+    //是否支持左右倒置
+    if (supportRtl)
+    {
+
+    }
+    else
+    {
+
+    }
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+}

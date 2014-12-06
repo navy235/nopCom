@@ -1,0 +1,37 @@
+﻿@model IList<ProductOverviewModel>
+@using Nop.Web.Models.Catalog;
+@if (Model.Count > 0)
+{
+    <div class="record-list head-inner clearfix">
+        <!--brands_products-->
+        <div class="record-left">
+            <div class="record-head">
+                <h2>@T("Products.RecentlyViewedProducts")</h2>
+            </div>
+            <div class="record-body">
+                <div class="record-wrap">
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        var product = Model[i];
+                        <a class="record-item" href="@Url.RouteUrl("Product", new { SeName = product.SeName })" title="@product.DefaultPictureModel.Title">
+                            @if (!String.IsNullOrEmpty(product.DefaultPictureModel.ImageUrl))
+                            {
+                                <div class="item-img-wrap">
+                                    <img class="item-img" alt="@product.DefaultPictureModel.AlternateText" src="@product.DefaultPictureModel.ImageUrl" title="@product.DefaultPictureModel.Title" />
+                                </div>
+                            }
+                            <div class="item-content">
+                                <span class="item-name">@product.Name</span>
+                                <div class="item-price">
+                                    <span class="price-vipshop">@product.ProductPrice.Price</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--/brands_products-->
+
+}

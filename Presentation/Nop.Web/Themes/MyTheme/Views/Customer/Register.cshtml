@@ -1,0 +1,132 @@
+﻿@model RegisterModel
+@using Nop.Web.Extensions
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_Head.Login.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Register").Text);
+}
+
+@using (Html.BeginForm("register", "customer", FormMethod.Post, new { autocomplete = "off" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="login-form">
+        <div class="login-header-tip">
+            <span class="fl">@T("Account.RegisterTip")</span>
+            <span class="fr f12">@T("Account.Registered")<a href="@Url.RouteUrl("login")" class="red hvLine">@T("Account.Login")</a></span>
+        </div>
+        <div class="message-error">
+            @Html.ValidationSummary(true)
+        </div>
+        @Html.Partial("_ExternalAuthentication.AssociateMessage")
+
+        <p class="inputs">
+            @Html.TextBoxFor(model => model.Email, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.Email, new { @class = "" })
+            @Html.RequiredHint()
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.Email)</span>
+        </p>
+        @if (Model.GenderEnabled)
+        {
+            <p class="inputs">
+                @Html.RadioButton("Gender", "M", (Model.Gender == "M"), new { id = "gender-male" })
+                <label class="forcheckbox  " for="gender-male">@T("Account.Fields.Gender.Male")</label>
+                @Html.RadioButton("Gender", "F", (Model.Gender == "F"), new { id = "gender-female" })
+                <label class="forcheckbox  " for="gender-female">@T("Account.Fields.Gender.Female")</label>
+            </p>
+            <p class="labels">
+                <span class="dred">
+                    @Html.ValidationMessageFor(model => model.Gender)</span>
+            </p> 
+        }
+
+        <p class="inputs">
+            @Html.TextBoxFor(model => model.FirstName, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.FirstName, new { @class = "" })
+            @Html.RequiredHint()
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.FirstName)</span>
+        </p>
+        <p class="inputs">
+            @Html.TextBoxFor(model => model.LastName, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.LastName, new { @class = "" })
+            @Html.RequiredHint()
+        </p>
+        <p class="labels">
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.LastName)</span>
+        </p>
+
+        @if (Model.UsernamesEnabled)
+        {
+            <p class="inputs">
+                @Html.TextBoxFor(model => model.Username, new { @class = "ipt", autocomplete = "off" })
+                @Html.LabelFor(model => model.Username, new { @class = "" })
+            </p>
+            <p class="labels">
+                <span class="dred">
+                    @Html.RequiredHint()
+                    @Html.ValidationMessageFor(model => model.Username)</span>
+                @if (Model.CheckUsernameAvailabilityEnabled)
+                {
+                    @Html.Partial("_CheckUsernameAvailability")
+                }
+            </p>
+               
+        }
+
+        <p class="inputs">
+            @Html.PasswordFor(model => model.Password, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.Password, new { @class = "" })
+            @Html.RequiredHint()
+        </p>
+        <p class="labels">
+
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.Password)</span>
+        </p>
+        <p class="inputs">
+            @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "ipt", autocomplete = "off" })
+            @Html.LabelFor(model => model.ConfirmPassword, new { @class = "" })
+            @Html.RequiredHint()
+        </p>
+
+        <p class="labels">
+
+            <span class="dred">
+                @Html.ValidationMessageFor(model => model.ConfirmPassword)</span>
+        </p>
+
+        @if (Model.DisplayCaptcha)
+        {
+            <div class="captcha-box">
+                @Html.Raw(Html.GenerateCaptcha())
+            </div>
+        }
+
+        <p class="mb30">
+            <button id="btnRegister" type="submit" class="btn btnReg">注册</button>
+        </p>
+    </div>
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('.inputs > input.ipt').on('focus', function () {
+            $(this).next('label').addClass('hide');
+        })
+
+        $('.inputs > input.ipt').on('blur', function () {
+            if ($(this).val() == '') {
+                $(this).next('label').removeClass('hide');
+            }
+        })
+    })
+</script>

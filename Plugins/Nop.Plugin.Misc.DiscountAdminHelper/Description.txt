@@ -1,0 +1,8 @@
+﻿Group: Misc
+FriendlyName: Discount admin helper
+SystemName: Misc.DiscountAdminHelper
+Version: 1.10
+SupportedVersions: 3.40
+Author: nopchina.net
+DisplayOrder: 1
+FileName: Nop.Plugin.Misc.DiscountAdminHelper.dll

@@ -1,0 +1,27 @@
+﻿@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+}
+
+
+<div class="check-steps">
+    <i class="check-steps-bg"></i>
+    <ul class="check-steps-block">
+        <li>
+            <span>查看购物袋</span>
+        </li>
+        <li class="current mid">
+            <span>确认订单信息</span>
+        </li>
+        <li>
+            <span>成功提交订单</span>
+        </li>
+    </ul>
+</div>
+
+
+@Html.Action("OrderSummary", "ShoppingCart")
+

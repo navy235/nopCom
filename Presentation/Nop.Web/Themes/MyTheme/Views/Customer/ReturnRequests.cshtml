@@ -1,0 +1,81 @@
+﻿@model CustomerReturnRequestsModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+
+@section left
+{
+    @Html.Partial("MyAccountNavigation", Model.NavigationModel, new ViewDataDictionary())
+}
+
+@section  bread{
+    <div class="breadcrumbs">
+        <a href="@Url.RouteUrl("CustomerInfo")" >@T("Account.MyAccount") </a>
+        &nbsp;&gt;&nbsp; @T("Account.CustomerReturnRequests")
+    </div>
+}
+
+
+<div class="order-list">
+    <table class="rq-table">
+        <colgroup>
+            <col class="c1">
+            <col class="c2">
+            <col class="c3">
+            <col class="c4">
+        </colgroup>
+        <thead>
+            <tr class="col-name">
+                <th>@T("ReturnRequests.Products.Name")</th>
+                <th>@T("ReturnRequests.Products.Status")</th>
+                <th>@string.Format(T("Account.CustomerReturnRequests.Reason").Text, "")</th>
+                <th>@string.Format(T("Account.CustomerReturnRequests.Action").Text, "")</th>
+            </tr>
+        </thead>
+
+        @foreach (var item in Model.Items)
+        {
+            <tr class="order-hd">
+                <td colspan="4">
+                    <span class="num">@string.Format(T("Account.CustomerReturnRequests.Title").Text, item.Id, item.ReturnRequestStatus)
+                        <em class="type">&nbsp;&nbsp;</em>
+                    </span>
+                    <span class="time">@string.Format(T("Account.CustomerReturnRequests.Date").Text, item.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss"))</span>
+                </td>
+            </tr>
+              
+            <tr class="order-bd">
+                <td class="goods">
+                    <a class="goods-pic" href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank">
+                        <img src="@item.PictureUrl"  alt="@item.ProductName"></a>
+                    <div class="goods-info">
+                        <a class="goods-name" href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" target="_blank">@item.ProductName</a>
+                        <div class="goods-attr">
+                            @Html.Raw(item.ProductAttributes)
+                        </div>
+                    </div>
+                </td>
+                <td class="good-action">@item.ReturnRequestStatus</td>
+                <td class="good-reasons">@item.ReturnReason</td>
+                <td class="good-action">@item.ReturnAction</td>
+            </tr>
+            
+            if (!String.IsNullOrEmpty(item.Comments))
+            {
+            <tr class="order-dd">
+                <td colspan="4">
+
+                    <span class="d-title">@T("Account.CustomerReturnRequests.Comments"):</span>
+
+                    @Html.Raw(Nop.Core.Html.HtmlHelper.FormatText(item.Comments, false, true, false, false, false, false))
+
+                </td>
+            </tr>
+            }
+        }
+    </table>
+</div>

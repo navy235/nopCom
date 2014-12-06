@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.Head.cshtml";
+    var fixedMenu = ViewBag.FixedMenu == null ? 0 : 1;
+}
+@Html.Widget("body_start_html_tag_after")
+
+
+@Html.Action("JavaScriptDisabledWarning", "Common")
+
+<script type="text/javascript">
+    AjaxCart.init(false, '.cart-qty', '.wishlist-qty', '#flyout-cart');
+</script>
+
+<div class="ajax-loading-block-window" style="display: block">
+    <div class="loading-image">
+    </div>
+</div>
+
+<div id="header">
+    @Html.Partial("TopHeader")
+    @Html.Partial("Header")
+    @Html.Action("TopMenu", "Catalog", new { fixedmenu = fixedMenu })
+</div>
+@Html.Widget("content_before")
+@RenderBody()
+
+@Html.Widget("content_after")
+@Html.Action("EuCookieLaw", "Common")
+
+@Html.Action("Footer", "Common")
+
+@Html.Widget("body_end_html_tag_before")

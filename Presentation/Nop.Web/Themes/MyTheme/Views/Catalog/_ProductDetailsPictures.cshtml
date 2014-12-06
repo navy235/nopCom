@@ -1,0 +1,124 @@
+﻿@model ProductDetailsModel
+@using Nop.Core.Domain.Media
+@using Nop.Core.Infrastructure;
+@using Nop.Web.Models.Catalog;
+@{
+    Html.AppendScriptParts("~/Themes/MyTheme/Scripts/jquery.elevatezoom.js");
+    Html.AppendScriptParts("~/Themes/MyTheme/Scripts/jquery.fancybox.pack.js");
+    Html.AppendCssFileParts("~/Themes/MyTheme/Content/fancybox/jquery.fancybox.css");
+    int productPerRow = EngineContext.Current.Resolve<MediaSettings>().ProductThumbPerRowOnProductDetailsPage;
+}
+
+
+
+
+@if (Model.PictureModels.Count > 1)
+{
+    var itemwidth = 65;
+    var allwidth = (Model.PictureModels.Count * itemwidth);
+
+    <div class="pic-wrap zoom-wrapper">
+        <img class="pic-zoom" id="main-product-img-@Model.Id" src="@Model.PictureModels[0].MidSizeImageUrl" data-zoom-image="@Model.PictureModels[0].FullSizeImageUrl"  />
+    </div>
+    <div class="pic-slider">
+        <a data-direction="right" class="pic-slider-left pic-slider-handle start">
+            <em class="icon-arrow-out">
+                <em class="icon-arrow-in"></em>
+            </em>
+        </a>
+        <div id="pic-list" class="pic-list">
+            <div class="pic-list-wrap" style="width:@(allwidth)px;margin-left:0px;">
+                @for (int i = 0; i < Model.PictureModels.Count; i++)
+                {
+                    var picture = Model.PictureModels[i];
+                    <div class="pic-item">
+                        <a href="#"  class="elevatezoom-gallery" data-image="@picture.MidSizeImageUrl" data-zoom-image="@picture.FullSizeImageUrl">
+                            <img src="@picture.ImageUrl"  alt='@picture.AlternateText' title="@picture.Title"  />
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+        <a data-direction="left" class="pic-slider-right pic-slider-handle">
+            <em class="icon-arrow-out">
+                <em class="icon-arrow-in"></em>
+            </em>
+        </a>
+    </div>
+
+    <script type="text/javascript">
+        $(function () {
+
+            var piccount =@(Model.PictureModels.Count);
+            var itemwidth=@(itemwidth);
+
+            $(".pic-zoom").elevateZoom({
+                zoomType: "inner",
+                cursor: "crosshair",
+                gallery: 'pic-list',
+                galleryActiveClass: "active",
+                imageCrossfade: true,
+                zoomWindowFadeIn: 500,
+                zoomWindowFadeOut: 500,
+                loadingIcon: "@Url.Content("~/Themes/MyTheme/Content/fancybox/fancybox_loading.gif")"
+            });
+
+            $(".pic-zoom").on("click", function (e) {
+                var ez = $('.pic-zoom').data('elevateZoom');
+                ez.closeAll(); //NEW: This function force hides the lens, tint and window	
+                $.fancybox(ez.getGalleryList(), {
+                    helpers: {
+                        title: null
+                    }
+                });
+                return false;
+            });
+
+            $('.pic-slider-handle').on('click',function(e){
+                var target=$(e.currentTarget);
+                var leftHandle=$('.pic-slider-left');
+                var rightHandle=$('.pic-slider-right');
+                var wrapper=$('.pic-list-wrap');
+                var direction=target.data('direction');
+                var currentML=parseInt(wrapper.css('marginLeft'),10);
+                var allwidth=itemwidth*piccount;
+                var maxML=allwidth-itemwidth*5;
+                if(direction=="left"){
+                    if(currentML==-maxML){
+                        return false;
+                    }
+                    currentML-=itemwidth;
+                }else{
+                    if(currentML==0){
+                        return false;
+                    }
+                    currentML+=itemwidth;
+                }
+                wrapper.animate({'marginLeft':currentML},500);
+                if(currentML==0){
+                    leftHandle.addClass('start');
+                }else{
+                    leftHandle.removeClass('start');
+                }
+                if(currentML==-maxML){
+                    rightHandle.addClass('end');
+                }else{
+                    rightHandle.removeClass('end');
+                }
+            })
+
+
+        })
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,102 @@
+﻿@model ProductsBlockAndSuggestModel
+
+@using Nop.Web.Models.Catalog;
+@if (Model.Products.Count > 0)
+{
+    <div class="record-list head-inner clearfix">
+        <!--brands_products-->
+        <div class="record-left">
+            <div class="record-head">
+                <h2>@T("Products.RecentlyViewedProducts")</h2>
+            </div>
+            <div class="record-body">
+                <div class="record-wrap">
+                    @for (int i = 0; i < Model.Products.Count; i++)
+                    {
+                        var product = Model.Products[i];
+                        <a class="record-item" href="@Url.RouteUrl("Product", new { SeName = product.SeName })" title="@product.DefaultPictureModel.Title">
+                            @if (!String.IsNullOrEmpty(product.DefaultPictureModel.ImageUrl))
+                            {
+                                <div class="item-img-wrap">
+                                    <img class="item-img" alt="@product.DefaultPictureModel.AlternateText" src="@product.DefaultPictureModel.ImageUrl" title="@product.DefaultPictureModel.Title" />
+                                </div>
+                            }
+                            <div class="item-content">
+                                <span class="item-name">@product.Name</span>
+                                <div class="item-price">
+                                    <span class="price-vipshop">@product.ProductPrice.Price</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="record-right">
+            <div class="record-head">
+                <div class="head-page">
+                    <span class="page-current">1</span>
+                    <span class="page-gap">/</span>
+                    <span class="page-total">3</span>
+                </div>
+                <h2>@T("Products.RecentlyViewedSuggestProducts")</h2>
+            </div>
+            <div class="record-body">
+                <div class="record-wrap record-suggest-wrap">
+                    @for (int i = 0; i < Model.SuggestProducts.Count; i++)
+                    {
+                        var product = Model.SuggestProducts[i];
+                        <a class="record-item" href="@Url.RouteUrl("Product", new { SeName = product.SeName })" title="@product.DefaultPictureModel.Title">
+                            @if (!String.IsNullOrEmpty(product.DefaultPictureModel.ImageUrl))
+                            {
+                                <div class="item-img-wrap">
+                                    <img class="item-img" alt="@product.DefaultPictureModel.AlternateText" src="@product.DefaultPictureModel.ImageUrl" title="@product.DefaultPictureModel.Title" />
+                                </div>
+                            }
+                            <div class="item-content">
+                                <span class="item-name">@product.Name</span>
+                                <div class="item-price">
+                                    <span class="price-vipshop">@product.ProductPrice.Price</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+            <a class="record-handle-left record-page-button icon-min-pageleft " data-direction="left"></a>
+            <a class="record-handle-right record-page-button icon-min-pageright" data-direction="right"></a>
+        </div>
+    </div>
+    <!--/brands_products-->
+
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('.record-page-button').on('click', function (e) {
+            var suggestwrap = $('.record-suggest-wrap');
+            var direction = $(this).data('direction');
+            var currentpage = parseInt($('.page-current').text(), 10);
+            var totalpage = parseInt($('.page-total').text(), 10);
+            var perwidth = 720;
+            var currentwidth = parseInt(suggestwrap.css('marginLeft'), 10);
+            if (direction == 'left') {
+                currentpage--;
+            } else {
+                currentpage++;
+            }
+            if (currentpage == 0) {
+                currentpage = totalpage;
+            }
+            if (currentpage > totalpage) {
+                currentpage = 1;
+            }
+            $('.page-current').text(currentpage);
+            var swipewidth = -(currentpage - 1) * perwidth;
+            suggestwrap.animate({
+                'marginLeft': swipewidth
+            }, 1000);
+        })
+    })
+
+</script>

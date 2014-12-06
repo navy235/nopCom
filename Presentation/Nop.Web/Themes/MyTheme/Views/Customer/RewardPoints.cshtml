@@ -1,0 +1,113 @@
+﻿@model CustomerRewardPointsModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_ColumnsTwo.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Account").Text);
+}
+@section left
+{
+    @Html.Partial("MyAccountNavigation", Model.NavigationModel, new ViewDataDictionary())
+}
+@section  bread{
+    <div class="breadcrumbs">
+        <a href="@Url.RouteUrl("CustomerInfo")" >@T("Account.MyAccount") </a>
+        &nbsp;&gt;&nbsp; @T("Account.RewardPoints")
+    </div>
+}
+
+<div class="form-container bordered">
+    <div class="points-container clearfix">
+        <div class="points-item">
+            <strong class="key">@T("Rewardpoints.Current")：</strong>
+            <em class="amount">@Model.RewardPointsBalance</em>
+        </div>
+        <div class="points-item">
+            <strong class="key">@T("Rewardpoints.Value")：</strong>
+            <em class="amount">@Model.RewardPointsAmount</em>
+        </div>
+
+        <div class="points-item last">
+            <a href="//jf.vip.com/?ff=234|2|1|1&amp;stamp=1" target="_blank">查看可兑换的礼品&gt;&gt;</a>
+
+            @if (Model.MinimumRewardPointsBalance > 0)
+            {
+                <span class="min-balance">
+                    @T("RewardPoints.MinimumBalance", Model.MinimumRewardPointsBalance, Model.MinimumRewardPointsAmount)
+                </span>
+            }
+
+        </div>
+    </div>
+</div>
+
+
+<div class="form-container bordered">
+    <div class="form-header">
+        <h3 class="bg">@T("RewardPoints.History")</h3>
+    </div>
+    <table class="points-table">
+        <colgroup>
+            <col class="c1">
+            <col class="c2">
+            <col class="c3">
+            <col class="c4">
+        </colgroup>
+        <thead>
+            <tr class="col-name">
+                <th>
+                    @T("RewardPoints.Fields.Date")
+                </th>
+                <th>
+                    @T("RewardPoints.Fields.Points")
+                </th>
+                <th>
+                    @T("RewardPoints.Fields.PointsBalance")
+                </th>
+                <th>
+                    @T("RewardPoints.Fields.Message")
+                </th>
+            </tr>
+        </thead>
+
+        @if (Model.RewardPoints.Count > 0)
+        {
+            <tbody>
+                @for (int i = 0; i < Model.RewardPoints.Count; i++)
+                {
+                    var item = Model.RewardPoints[i];
+                    <tr @(i % 2 == 0 ? Html.Raw(" class=\"odd order-bd\"") : Html.Raw(" class=\"even order-bd\" "))>
+                        <td class="td-date">
+                            @item.CreatedOn
+                        </td>
+                        <td class="td-points">
+                            @item.Points
+                        </td>
+                        <td class="td-points-balance">
+                            @item.PointsBalance
+                        </td>
+                        <td class="td-message">
+                            @item.Message
+                        </td>
+                    </tr>
+                    
+                }
+            </tbody>
+        }
+
+        else
+        {
+            <tr class="order-empty">
+                <td colspan="4">
+                    @T("RewardPoints.NoHistory")
+                </td>
+            </tr>
+         
+         
+        }
+    </table>
+
+</div>
+
+

@@ -1,0 +1,8 @@
+D:\Nop\Presentation\Nop.Web\Plugins\Misc.MtCheckout\Description.txt
+D:\Nop\Presentation\Nop.Web\Plugins\Misc.MtCheckout\Views\MiscMtCheckout\Configure.cshtml
+D:\Nop\Presentation\Nop.Web\Plugins\Misc.MtCheckout\Nop.Plugin.Misc.MtCheckout.dll
+D:\Nop\Presentation\Nop.Web\Plugins\Misc.MtCheckout\Nop.Plugin.Misc.MtCheckout.pdb
+D:\Nop\Plugins\Nop.Plugin.Misc.MtCheckout\obj\Debug\Nop.Plugin.Misc.MtCheckout.csprojResolveAssemblyReference.cache
+D:\Nop\Plugins\Nop.Plugin.Misc.MtCheckout\obj\Debug\Nop.Plugin.Misc.MtCheckout.dll
+D:\Nop\Plugins\Nop.Plugin.Misc.MtCheckout\obj\Debug\Nop.Plugin.Misc.MtCheckout.pdb
+D:\Nop\Presentation\Nop.Web\Plugins\Misc.MtCheckout\Views\MiscMtCheckout\Index.cshtml

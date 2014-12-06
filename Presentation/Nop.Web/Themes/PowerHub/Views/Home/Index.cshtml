@@ -1,0 +1,142 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.cshtml";
+}
+@{
+    //current category ID
+    int currentCategoryId = 0;
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.RequestContext.RouteData.Values["categoryId"].ToString());
+    }
+
+
+    //current manufacturer ID
+    int currentManufacturerId = 0;
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("manufacturer", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentManufacturerId = Convert.ToInt32(Url.RequestContext.RouteData.Values["manufacturerId"].ToString());
+    }
+
+
+    //current product ID
+    int currentProductId = 0;
+    if (Url.RequestContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.RequestContext.RouteData.Values["action"].ToString().Equals("product", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentProductId = Convert.ToInt32(Url.RequestContext.RouteData.Values["productId"].ToString());
+    }
+}
+@Html.Widget("home_page_top")
+@Html.Action("HomepageCategories", "Catalog")
+
+<div class="page-home home-page">
+    <div class="page-body">
+		@*<div class="left_column col-md-3 nopadding1">
+			@Html.Action("CategoryNavigation", "Catalog", new { currentCategoryId = currentCategoryId, currentProductId = currentProductId })
+			<div class="ad-left">
+				<img class="img-responsive" src="@Url.Content("~/themes/powerhub/content/images/ad.png")" alt="ADVERTISEMENT" /> 
+			</div>
+		</div>*@
+
+		<div class="right_column col-md-12 nopadding">
+			@*@Html.Action("TopicBlock", "Topic", new { systemName = "HomePageText" })*@
+			@Html.Action("HomePageNews", "News")
+			@Html.Action("HomePagePolls", "Poll")
+			@Html.Widget("home_page_bottom")
+			<ul class="nav nav-tabs cl-effect-5" id="myTab">
+			  <li class="active"><a href="#featured" data-toggle="tab"> <span data-hover="FEATURED">FEATURED</span></a></li>
+			  <li><a href="#newproducts" data-toggle="tab"><span data-hover="NEW ARRIVALS">NEW ARRIVALS</span></a></li>
+			  <li><a href="#bestseller" data-toggle="tab"> <span data-hover="BESTSELLERS">BESTSELLERS</span> </a></li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="active tab-pane " id="featured">
+					@Html.Action("HomepageProducts", "Catalog")
+				</div>
+
+				<div class="tab-pane" id="newproducts">
+					@Html.Partial("NewArrivals")
+				</div>
+
+				<div class="tab-pane" id="bestseller">
+					@Html.Action("HomepageBestSellers", "Catalog")
+				</div>
+			</div>
+			
+			<div class="clear"> </div>
+			
+			@*<div class="homepage-manufacturer">
+				<div class="title">
+					SHOP BY BRANDS
+					<div class="customNavigation">
+						<a class="prev1" style="cursor:pointer"><img src="@Url.Content("~/themes/powerhub/content/images/left_scroll.png")" alt="PREV" /></a>
+						<a class="next1" style="cursor:pointer"><img src="@Url.Content("~/themes/powerhub/content/images/right_scroll.png")" alt="Next" /></a>
+					</div>
+				</div>
+				
+				<div id="owl-demo1" class="owl-carousel brands owl-theme">
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+					<div class="item"> <img src="@Url.Content("~/themes/powerhub/content/images/brands.png")" alt="LOGO" />  </div>
+				</div>
+			</div>*@
+		</div>
+
+    </div>
+</div>
+
+<script>
+	$('#myTab a').click(function (e) {
+	  e.preventDefault()
+	  $(this).tab('show')
+	})
+</script>
+
+<script>
+	$(document).ready(function() {
+ 
+	  var owl = $("#owl-demo");
+	  var owl1 = $("#owl-demo1");
+	 
+	  owl.owlCarousel({
+		  items : 4, //10 items above 1000px browser width
+		  itemsDesktop : [1000,4], //5 items between 1000px and 901px
+		  itemsDesktopSmall : [900,2], // betweem 900px and 601px
+		  itemsTablet: [600,2], //2 items between 600 and 0
+		  itemsMobile: [400,1], //2 items between 600 and 0
+	  });
+	  
+	  owl1.owlCarousel({
+		  items : 5, //10 items above 1000px browser width
+		  itemsDesktop : [1000,5], //5 items between 1000px and 901px
+		  itemsDesktopSmall : [900,3], // betweem 900px and 601px
+		  itemsTablet: [600,2], //2 items between 600 and 0
+		  itemsMobile: [400,1], //2 items between 600 and 0
+	  });
+	 
+	  // Custom Navigation Events
+	  $(".next").click(function(){
+		owl.trigger('owl.next');
+	  })
+	  $(".prev").click(function(){
+		owl.trigger('owl.prev');
+	  })
+
+	  
+	  // Custom Navigation Events
+	  $(".next1").click(function(){
+		owl1.trigger('owl.next');
+	  })
+	  $(".prev1").click(function(){
+		owl1.trigger('owl.prev');
+	  })
+	  
+	});
+</script>

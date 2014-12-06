@@ -1,0 +1,33 @@
+﻿@{
+    Layout = "";
+}
+@model Nop.Plugin.Misc.MtCheckout.Models.ConfigurationModel
+@using Nop.Web.Framework;
+@Html.Action("StoreScopeConfiguration", "Setting", new { area = "Admin" })
+@using (Html.BeginForm())
+{
+    <fieldset>
+        <legend><strong>@T("Plugins.Misc.MtCheckout.Title")</strong></legend>
+        <table class="adminContent">
+            <tr>
+                <td class="adminTitle">
+                    @Html.NopLabelFor(model => model.Enabled):
+                </td>
+                <td class="adminData">
+                    @Html.EditorFor(model => model.Enabled)
+                    @Html.ValidationMessageFor(model => model.Enabled)
+                </td>
+            </tr>
+            
+        </table>
+    </fieldset>
+   
+    <br />
+    <table class="adminContent">
+        <tr>
+            <td colspan="2">
+                <input type="submit" name="save" class="k-button" value="@T("Admin.Common.Save")" />
+            </td>
+        </tr>
+    </table>
+}

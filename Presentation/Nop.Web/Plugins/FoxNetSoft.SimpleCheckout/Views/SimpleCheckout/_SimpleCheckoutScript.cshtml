@@ -1,0 +1,734 @@
+﻿@model FoxNetSoft.Plugin.Misc.SimpleCheckout.Models.SimpleCheckoutModel
+@using System.Globalization
+@using System.Text
+@using Nop.Core
+@using Nop.Web.Framework.UI
+@using Nop.Web.Framework
+@using FoxNetSoft.Plugin.Misc.SimpleCheckout.Models
+@{
+    Html.AppendCssFileParts("~/Content/jquery-ui-themes/smoothness/jquery-ui-1.10.3.custom.min.css");     
+    var simpleCheckoutTableScripts = new StringBuilder();
+    string simpleCheckoutShippingAddressesTableName = "simplecheckoutshippingaddresses";
+    string simpleCheckoutBillingAddressesTableName = "simplecheckoutbillingaddresses";
+    bool setcommas = false;
+
+    simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "var {0} = [ \n", simpleCheckoutShippingAddressesTableName);
+    setcommas = false;
+    for (int i = 0; i < Model.ExistingShippingAddresses.Count(); i++)
+    {
+        var address = Model.ExistingShippingAddresses[i];
+        if (address!=null)
+        {
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "{0}{{ Id:\"{1}\"", setcommas ? "," : "", address.Id);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", FirstName:\"{0}\"", address.FirstName);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", LastName:\"{0}\"", address.LastName);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", PhoneNumber:\"{0}\"", address.PhoneNumber);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", FaxNumber:\"{0}\"", address.FaxNumber);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Email:\"{0}\"", address.Email);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Company:\"{0}\"", address.Company);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", CountryId:{0}", address.CountryId == null ? 0 : address.CountryId);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", StateProvinceId:{0}", address.StateProvinceId == null ? 0 : address.StateProvinceId);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", City:\"{0}\"", address.City);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Address1:\"{0}\"", address.Address1);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Address2:\"{0}\"", address.Address2);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", ZipPostalCode:\"{0}\"", address.ZipPostalCode);
+        
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "}}\n");
+            setcommas = true;
+        }
+    }
+    simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "]; \n");
+
+    simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "var {0} = [ \n", simpleCheckoutBillingAddressesTableName);
+    setcommas = false;
+    for (int i = 0; i < Model.ExistingBillingAddresses.Count(); i++)
+    {
+        var address = Model.ExistingBillingAddresses[i];
+        if (address != null)
+        {
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "{0}{{ Id:\"{1}\"", setcommas ? "," : "", address.Id);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", FirstName:\"{0}\"", address.FirstName);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", LastName:\"{0}\"", address.LastName);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", PhoneNumber:\"{0}\"", address.PhoneNumber);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", FaxNumber:\"{0}\"", address.FaxNumber);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Email:\"{0}\"", address.Email);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Company:\"{0}\"", address.Company);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", CountryId:{0}", address.CountryId == null ? 0 : address.CountryId);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", StateProvinceId:{0}", address.StateProvinceId == null ? 0 : address.StateProvinceId);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", City:\"{0}\"", address.City);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Address1:\"{0}\"", address.Address1);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", Address2:\"{0}\"", address.Address2);
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, ", ZipPostalCode:\"{0}\"", address.ZipPostalCode);
+
+            simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "}}\n");
+            setcommas = true;
+        }
+    }
+    simpleCheckoutTableScripts.AppendFormat(CultureInfo.InvariantCulture, "]; \n");    
+}
+@*<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>*@
+<script type="text/javascript">
+    var __ShimpleCheckout_loadWaiting=false; 
+    var __fns_simple_checkout_discountcurrentcode= "@Model.DiscountBox.CurrentCode";
+    var __fns_simple_checkout_waitmessage="@T("Common.Wait...")";
+    var currentBillingAddress=null;
+    var billingaddresswindowselector="#billingaddresswindow";
+    var isnewbillingaddress=false;
+    var __ShimpleCheckout_SkipLoading=false;
+    // simpleCheckout table initialize
+    @Html.Raw(simpleCheckoutTableScripts.ToString())
+
+    function getShippingAddress() 
+    {
+        var addressid= $("#@Html.FieldIdFor(model => model.ShippingAddress.Id)").val();
+        var firstname= $("#@Html.FieldIdFor(model => model.ShippingAddress.FirstName)").val();
+        var lastname= $("#@Html.FieldIdFor(model => model.ShippingAddress.LastName)").val();
+        var phonenumber= $("#@Html.FieldIdFor(model => model.ShippingAddress.PhoneNumber)").val();
+        var faxnumber= $("#@Html.FieldIdFor(model => model.ShippingAddress.FaxNumber)").val();
+        var email= $("#@Html.FieldIdFor(model => model.ShippingAddress.Email)").val();
+        var company= $("#@Html.FieldIdFor(model => model.ShippingAddress.Company)").val();
+        var countryid= $("#@Html.FieldIdFor(model => model.ShippingAddress.CountryId)").val();
+        var stateprovinceid= $("#@Html.FieldIdFor(model => model.ShippingAddress.StateProvinceId)").val();
+        var city= $("#@Html.FieldIdFor(model => model.ShippingAddress.City)").val();
+        var address1= $("#@Html.FieldIdFor(model => model.ShippingAddress.Address1)").val();
+        var address2= $("#@Html.FieldIdFor(model => model.ShippingAddress.Address2)").val();
+        var zippostalcode= $("#@Html.FieldIdFor(model => model.ShippingAddress.ZipPostalCode)").val();
+        var country= $("#@Html.FieldIdFor(model => model.ShippingAddress.CountryId) option:selected").text();
+        var stateprovince= $("#@Html.FieldIdFor(model => model.ShippingAddress.StateProvinceId) option:selected").text();
+
+        // poor address's validation
+        return (addressid == "") ? null : { Id: addressid, FirstName: firstname,LastName :lastname,
+            PhoneNumber:phonenumber,FaxNumber:faxnumber,
+            Email:email,Company: company,
+            CountryId: countryid,StateProvinceId:stateprovinceid,
+            City: city,Address1:address1,Address2:address2,ZipPostalCode:zippostalcode,
+            Country:country,StateProvince:stateprovince};
+    };
+
+    function getBillingAddress() 
+    {
+        @if (!Model.AllowUseBillingAddress)
+        {
+            <text>
+            return getShippingAddress();
+            </text>
+        }
+        
+        if (!$("#@Html.FieldIdFor(model => model.UseDifferentAddressForBilling)").prop("checked"))
+        {
+            return getShippingAddress();
+        };
+
+        var addressid= $("#@Html.FieldIdFor(model => model.BillingAddress.Id)").val();
+        var firstname= $("#@Html.FieldIdFor(model => model.BillingAddress.FirstName)").val();
+        var lastname= $("#@Html.FieldIdFor(model => model.BillingAddress.LastName)").val();
+        var phonenumber= $("#@Html.FieldIdFor(model => model.BillingAddress.PhoneNumber)").val();
+        var faxnumber= $("#@Html.FieldIdFor(model => model.BillingAddress.FaxNumber)").val();
+        var email= $("#@Html.FieldIdFor(model => model.BillingAddress.Email)").val();
+        var company= $("#@Html.FieldIdFor(model => model.BillingAddress.Company)").val();
+        var countryid= $("#@Html.FieldIdFor(model => model.BillingAddress.CountryId)").val();
+        var stateprovinceid= $("#@Html.FieldIdFor(model => model.BillingAddress.StateProvinceId)").val();
+        var city= $("#@Html.FieldIdFor(model => model.BillingAddress.City)").val();
+        var address1= $("#@Html.FieldIdFor(model => model.BillingAddress.Address1)").val();
+        var address2= $("#@Html.FieldIdFor(model => model.BillingAddress.Address2)").val();
+        var zippostalcode= $("#@Html.FieldIdFor(model => model.BillingAddress.ZipPostalCode)").val();
+        var country= $("#@Html.FieldIdFor(model => model.BillingAddress.CountryId) option:selected").text();
+        var stateprovince= $("#@Html.FieldIdFor(model => model.BillingAddress.StateProvinceId) option:selected").text();
+
+        // poor address's validation
+        return (addressid == "") ? null : { Id: addressid, FirstName: firstname,LastName :lastname,
+            PhoneNumber:phonenumber,FaxNumber:faxnumber,
+            Email:email,Company: company,
+            CountryId: countryid,StateProvinceId:stateprovinceid,
+            City: city,Address1:address1,Address2:address2,ZipPostalCode:zippostalcode,
+            Country:country,StateProvince:stateprovince};
+    };
+
+    function changeShippingAddress(id) 
+    {
+        // simpleCheckout Addresses table
+        for (var i = 0; i < @(simpleCheckoutShippingAddressesTableName).length; i++) {
+            var address= @(simpleCheckoutShippingAddressesTableName)[i];
+            if (address!= undefined && address.Id==id) {
+                setAddress(true,address);
+                adjustShippingMethod(); //AjaxSipmentMethods
+                //adjustPaymentMethod(); //AjaxPaymentMethods
+                break;
+            }
+        }
+    };
+
+    function changeBillingAddress(id) 
+    {
+        // simpleCheckout Addresses table
+        for (var i = 0; i < @(simpleCheckoutBillingAddressesTableName).length; i++) {
+            var address= @(simpleCheckoutBillingAddressesTableName)[i];
+            if (address!= undefined && address.Id==id) {
+                setAddress(false,address);
+                break;
+            }
+        }
+    };
+
+    function copyShippingToBillingAddress() 
+    {
+        var address=getShippingAddress();
+        if (address!= undefined) {
+            $("#existingbillingaddresses").val(address.Id);
+            setAddress(false,address);
+        }
+    };
+
+    function saveBillingAddress() 
+    {
+        var address=getBillingAddress() ;
+        if (address!= undefined) {
+            currentBillingAddress=address;
+
+            $(".billing-address-description-message .name").text(address.FirstName+" "+address.LastName);
+            $(".billing-address-description-message .email").text("@T("Address.Fields.Email"): "+address.Email);
+            $(".billing-address-description-message .phone").text("@T("Address.Fields.PhoneNumber"): "+address.PhoneNumber);
+            $(".billing-address-description-message .fax").text("@T("Address.Fields.FaxNumber"): "+address.FaxNumber);
+            $(".billing-address-description-message .company").text(address.Company);
+            $(".billing-address-description-message .address1").text(address.Address1);
+            $(".billing-address-description-message .address2").text(address.Address2);
+            var cityStateZip="";
+                @if (Model.BillingAddress.CityEnabled)
+                {
+                    <text>cityStateZip = address.City;</text>
+                    if (Model.BillingAddress.StateProvinceEnabled || Model.BillingAddress.ZipPostalCodeEnabled)
+                    {
+                        <text>cityStateZip += ",";</text>
+                    }
+                }
+                @if (Model.BillingAddress.StateProvinceEnabled)
+                {
+                    <text>
+                    if (cityStateZip.length>0)
+                    {
+                        cityStateZip =cityStateZip+ " ";
+                    }
+                    cityStateZip = cityStateZip+address.StateProvinceName;
+                    </text>
+                }
+                @if (Model.BillingAddress.ZipPostalCodeEnabled)
+                {
+                    <text>
+                    if (cityStateZip.length>0)
+                    {
+                        cityStateZip = cityStateZip+" ";
+                    }
+                    cityStateZip = cityStateZip+address.ZipPostalCode;
+                    </text>
+                }
+            $(".billing-address-description-message .city-state-zip").text(cityStateZip);
+            $(".billing-address-description-message .country").text(address.Country);
+
+            $(".billing-address-description").show();
+        }
+        $(billingaddresswindowselector).dialog("destroy");
+        //adjustShippingMethod(); //AjaxSipmentMethods
+        adjustPaymentMethod(); //AjaxPaymentMethods
+    };
+    function cancelBillingAddress() 
+    {
+        var address=currentBillingAddress;
+        if (address!= undefined) {
+            setAddress(false,address);
+        }
+        $(billingaddresswindowselector).dialog("destroy");
+        if (isnewbillingaddress)
+        {
+            $(".billing-address-description").hide();
+            $("#@Html.FieldIdFor(model => model.UseDifferentAddressForBilling)").prop( "checked", false );
+        }
+    };
+
+    function showBillingAddressWindow(){
+        if($(this).is(":checked")) {
+            isnewbillingaddress=true;
+            openBillingAddressWindow();
+        }
+        else
+        {
+            //$(".billing-address-description").html="";
+            $(".billing-address-description").hide();
+        }
+    }
+
+    function editBillingAddress(){
+        isnewbillingaddress=false;
+        openBillingAddressWindow();
+    }
+
+    function openBillingAddressWindow () {
+        $(billingaddresswindowselector).dialog({
+            autoOpen: true,
+            closeOnEscape: true,
+            width: 550,
+            minHeight:"auto",
+            modal: true,
+            close: function () {
+                $(this).dialog('destroy');
+            },
+            open: function(event, ui) { 
+                //hide close button.
+                $(this).parent().children().children('.ui-dialog-titlebar-close').hide();
+            }
+        });
+    }
+
+    function setAddress(isShipping,address) 
+    {
+        __ShimpleCheckout_SkipLoading=true;
+        if (address!= undefined) {
+            if (isShipping)
+            {
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Id)").val(address.Id);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.FirstName)").val(address.FirstName);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.LastName)").val(address.LastName);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.PhoneNumber)").val(address.PhoneNumber);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.FaxNumber)").val(address.FaxNumber);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Email)").val(address.Email);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Company)").val(address.Company);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.CountryId)").val(address.CountryId);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.CountryId)").change();
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.StateProvinceId)").val(address.StateProvinceId);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.City)").val(address.City);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Address1)").val(address.Address1);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Address2)").val(address.Address2);
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.ZipPostalCode)").val(address.ZipPostalCode);
+            }
+            else
+            {
+                $("#@Html.FieldIdFor(model => model.BillingAddress.Id)").val(address.Id);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.FirstName)").val(address.FirstName);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.LastName)").val(address.LastName);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.PhoneNumber)").val(address.PhoneNumber);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.FaxNumber)").val(address.FaxNumber);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.Email)").val(address.Email);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.Company)").val(address.Company);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.CountryId)").val(address.CountryId);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.CountryId)").change();
+                $("#@Html.FieldIdFor(model => model.BillingAddress.StateProvinceId)").val(address.StateProvinceId);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.City)").val(address.City);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.Address1)").val(address.Address1);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.Address2)").val(address.Address2);
+                $("#@Html.FieldIdFor(model => model.BillingAddress.ZipPostalCode)").val(address.ZipPostalCode);
+            }
+        }
+        __ShimpleCheckout_SkipLoading=false;
+    };
+    function togglePickUpInStore() 
+    {
+        var ddlshippingoption = $("#shippingoption").val();
+        //In-Store Pickup___NopCommercePickUpInStore,
+        if (ddlshippingoption != null && ddlshippingoption.indexOf('___NopCommercePickUpInStore') > -1) {
+            $('#record-address-country').hide();
+            $('#record-address-stateprovince').hide();
+            $('#record-address-city').hide();
+            $('#record-address-streetaddress').hide();
+            $('#record-address-streetaddress2').hide();
+            $('#record-address-zippostalcode').hide();
+        } else {
+            $('#record-address-country').show();
+            $('#record-address-stateprovince').show();
+            $('#record-address-city').show();
+            $('#record-address-streetaddress').show();
+            $('#record-address-streetaddress2').show();
+            $('#record-address-zippostalcode').show();
+        }
+    };
+
+    function fns_simplecheckout_applydiscountcouponcode()
+    {
+        var discountcouponcode= $("#discountcouponcode").val();
+        if (discountcouponcode != undefined && discountcouponcode.length > 0 && $.trim(discountcouponcode).length > 0) {
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("ApplyDiscountCoupon")',
+                type: 'post',
+                async: false,
+                data: { "discountcouponcode": discountcouponcode},
+                success: function (response) {
+                    if (response.success)
+                    {
+                        $("#discountcouponcode").text(response.discountcouponcode);
+                        $('#discountcouponcodemessage').text("");
+                        $('#removediscountcouponcode').show();
+                        adjustOrderSummary();
+                    }
+                    else
+                    {
+                        $("#discountcouponcode").val(__fns_simple_checkout_discountcurrentcode);
+                        $('#discountcouponcodemessage').text(response.message);
+                    }
+                    return true;
+                },
+                error: function () {
+                    alert('Failed to save discount code.');
+                    $("#discountcouponcode").val(__fns_simple_checkout_discountcurrentcode);
+                    $('#discountcouponcodemessage').text("Failed to save discount code.");
+                    return false;
+                }
+            });
+        }
+        else
+        {
+            $("#discountcouponcode").val(__fns_simple_checkout_discountcurrentcode);
+        }
+    };
+
+    function fns_simplecheckout_removediscountcouponcode()
+    {
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("RemoveDiscountCoupon")',
+                                type: 'post',
+                                async: false,
+                                success: function (response) {
+                                    if (response.success)
+                                    {
+                                        __fns_simple_checkout_discountcurrentcode="";
+                                        $("#discountcouponcode").val("");
+                                        $('#discountcouponcodemessage').text("");
+                                        $('#removediscountcouponcode').hide();
+                                        adjustOrderSummary();
+                                    }
+                                    else
+                                    {
+                                        $("#discountcouponcode").val(__fns_simple_checkout_discountcurrentcode);
+                                        $('#discountcouponcodemessage').text(response.message);
+                                    }
+                                    return true;
+                                },
+                                error: function () {
+                                    alert('Failed to remove discount code.');
+                                    $("#discountcouponcode").val(__fns_simple_checkout_discountcurrentcode);
+                                    $('#discountcouponcodemessage').text("Failed to remove discount code.");
+                                    return false;
+                                }
+         });
+    };
+
+    function fns_simplecheckout_applygiftcardcouponcode()
+    {
+        var giftcardcouponcode= $("#giftcardcouponcode").val();
+        $("#giftcardcouponcode").val("");
+        if (giftcardcouponcode != undefined && giftcardcouponcode.length > 0 && $.trim(giftcardcouponcode.length > 0)) {
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("ApplyGiftCard")',
+                                    type: 'post',
+                                    async: false,
+                                    data: { "giftcardcouponcode": giftcardcouponcode},
+                                    success: function (response) {
+                                        if (response.success)
+                                        {
+                                            $('#giftcardmessage').text("");
+                                            adjustOrderSummary();
+                                        }
+                                        else
+                                        {
+                                            $('#giftcardmessage').text(response.message);
+                                        }
+                                        return true;
+                                    },
+                                    error: function () {
+                                        alert('Failed to save gift card.');
+                                        $('#giftcardmessage').text("Failed to save gift card.");
+                                        return false;
+                                    }
+            });
+         }
+    };
+
+    function fns_simplecheckout_removegiftcardcouponcode(caller)
+    {
+        var giftCardId=0;
+        var nameString = caller.attr("name");
+        if (nameString.length > 0) {
+            var n = nameString.indexOf("removegiftcard-");
+            if (n != -1) {
+                giftCardId = nameString.substring(n + 15);
+            }
+        }
+        if (giftCardId==0)
+            return;
+
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("RemoveGiftCard")',
+                        type: 'post',
+                        async: false,
+                        data: { "giftCardId": giftCardId},
+                        success: function (response) {
+                            if (response.success)
+                            {
+                                $('#giftcardmessage').text("");
+                                adjustOrderSummary();
+                            }
+                            else
+                            {
+                                $('#giftcardmessage').text(response.message);
+                            }
+                            return true;
+                        },
+                        error: function () {
+                            alert('Failed to remove gift card.');
+                            return false;
+                        }
+                    });
+                };
+
+    // PaymentInfo
+    function adjustPaymentInfo()
+    {
+        var tmpSelect = $('.simple-checkout-paymentinfo');
+        tmpSelect.html('');
+  
+        var ddlpaymentmethod= sc_GetddlPaymentMethodValue();
+
+        var paymentInfoProgress = $("#paymentinfo-loading-progress");
+        if (paymentInfoProgress.length <1)
+        {
+            tmpSelect.prepend("<span id=\"paymentinfo-loading-progress\" style=\"display: none;\" class=\"please-wait\">"+__fns_simple_checkout_waitmessage+"</span>");
+            paymentInfoProgress = $("#paymentinfo-loading-progress");
+        }
+        paymentInfoProgress.show();
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("AjaxPaymentInfo")',
+            type: 'post',
+            data: { "paymentmethod": ddlpaymentmethod },
+            success: function (data) {
+                var tmpSelect = $('.simple-checkout-paymentinfo');
+                tmpSelect.html('');
+                if (data.length>0) {
+                    tmpSelect.append(data);
+                }
+                return true;
+            },
+            error: function () {
+                alert('Failed to retrieve payment info. Please refresh the page.');
+                return false;
+            }
+        });
+        return true;
+    };
+
+    // update OrderSummary from ShoppingCart
+    function adjustOrderSummary()
+    {
+        if (__ShimpleCheckout_loadWaiting)
+            return true;
+        __ShimpleCheckout_loadWaiting=true;
+        var tmpSelect = $('.simple-checkout-order-summary-body');
+        tmpSelect.html('');
+  
+        var ddlshippingoption= sc_GetddlShippingMethodValue();
+        var ddlpaymentmethod= sc_GetddlPaymentMethodValue();
+
+        var ordersummaryProgress = $("#order-summary-loading-progress");
+        if (ordersummaryProgress.length <1)
+        {
+            //tmpSelect.prepend("<span id=\"order-summary-loading-progress\" style=\"display: none;\" class=\"please-wait\">@T("Common.Wait...")</span>");
+            tmpSelect.prepend("<span id=\"order-summary-loading-progress\" style=\"display: none;\" class=\"please-wait\"></span>");
+            ordersummaryProgress = $("#order-summary-loading-progress");
+            ordersummaryProgress.text(__fns_simple_checkout_waitmessage);
+        }
+        ordersummaryProgress.show();
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("AjaxOrderSummary")',
+            type: 'post',
+            data: { "shippingoption": ddlshippingoption, "paymentmethod": ddlpaymentmethod },
+            success: function (data) {
+                var tmpSelect = $('.simple-checkout-order-summary-body');
+                tmpSelect.html('');
+                tmpSelect.append(data);
+                __ShimpleCheckout_loadWaiting=false;
+                $(".remove-gift-card-button").on("click",function()
+                {
+                    fns_simplecheckout_removegiftcardcouponcode($(this));
+                    return false;
+                });
+                return true;
+            },
+            error: function () {
+                alert('Failed to retrieve order summary.');
+                __ShimpleCheckout_loadWaiting=false;
+                return false;
+            }
+        });
+        return true;
+    };
+
+    // update shippingmethod from ShoppingCart
+    function adjustShippingMethod()
+    {
+        if (__ShimpleCheckout_SkipLoading)
+            return;
+        var address = getShippingAddress();
+        // poor address's validation
+        if (address == null) {
+            alert("Specify a address please!");
+            return false;
+        }
+        $("#shipmentmethods-loading-progress").show();
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("AjaxShippingMethod")',
+            type: 'post',
+            dataType: 'json',
+            async: false,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(address),
+            success: sc_AjaxShippingMethod_success,
+            error: function () {
+                //dom_shippingoption.empty();
+                alert('Failed to retrieve shipping method.');
+                $("#shipmentmethods-loading-progress").hide();
+                return false;
+            }
+        });
+        adjustPaymentMethod();
+        return true;
+    };
+
+    // update paymentmethod from ShoppingCart
+    function adjustPaymentMethod()
+    {
+        if (__ShimpleCheckout_SkipLoading)
+            return;
+        var address = getBillingAddress();
+        // poor address's validation
+        if (address == null) {
+            alert("Specify a address please!");
+            return false;
+        }
+        var msg = $("#form-fns-simplecheckout").serialize();
+        $("#paymentmethods-loading-progress").show();
+        $.ajax({
+            cache: false,
+            url: '@Url.Action("AjaxPaymentMethod")',
+            type: 'post',
+            async: false,
+            data: msg,
+            success: sc_AjaxPaymentMethod_success,
+            error: function () {
+                //dom_shippingoption.empty();
+                alert('Failed to retrieve payment method.');
+                $("#paymentmethods-loading-progress").hide();
+                return false;
+            }
+        });
+
+        return true;
+    };
+
+    $(document).ready(function () {
+        currentBillingAddress=getBillingAddress();
+
+        if (@(Model.IsShowHint.ToString().ToLower()))
+            $(".simple-checkout-table img").attr("src", "/Plugins/FoxNetSoft.SimpleCheckout/Styles/images/ico-help.gif");
+        else
+            $(".simple-checkout-table img").attr("style", "display:none");
+
+        $("#@Html.FieldIdFor(model => model.ShippingAddress.StateProvinceId)").change(adjustShippingMethod);
+        $("#@Html.FieldIdFor(model => model.ShippingAddress.ZipPostalCode)").change(adjustShippingMethod);
+        $("#@Html.FieldIdFor(model => model.ShippingAddress.City)").change(adjustShippingMethod);
+
+        $("#@Html.FieldIdFor(model => model.UseDifferentAddressForBilling)").change(showBillingAddressWindow);
+
+        adjustOrderSummary();
+        adjustPaymentInfo();
+
+        $('.confirm-order-next-step-button').click(function () {
+            //terms of service
+            var termOfServiceOk = true;
+            if ($('#termsofservice').length > 0) {
+                //terms of service element exists
+                if (!$('#termsofservice').is(':checked')) {
+                    $("#terms-of-service-warning-box").dialog();
+                    termOfServiceOk = false;
+                } else {
+                    termOfServiceOk = true;
+                }
+            }
+            if (termOfServiceOk) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    });
+
+</script>
+
+@if (Model.ShippingAddress.CountryEnabled && Model.ShippingAddress.StateProvinceEnabled)
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#@Html.FieldIdFor(model => model.ShippingAddress.CountryId)").change(function () {
+                var selectedItem = $(this).val();
+                var ddlStates = $("#@Html.FieldIdFor(model => model.ShippingAddress.StateProvinceId)");
+                var statesProgress = $("#shippingstates-loading-progress");
+                statesProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.RouteUrl("GetStatesByCountryId"))",
+                    data: { "countryId": selectedItem, "addEmptyStateIfRequired": "true" },
+                    async: false,
+                    success: function (data) {
+                        ddlStates.html('');
+                        $.each(data, function (id, option) {
+                            ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                        });
+                        statesProgress.hide();
+                        adjustShippingMethod(); //AjaxSipmentMethods
+                        //adjustPaymentMethod(); //AjaxPaymentMethods
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve states.');
+                        statesProgress.hide();
+                    }
+                });
+            });
+        });
+    </script>
+}
+@if (Model.BillingAddress.CountryEnabled && Model.BillingAddress.StateProvinceEnabled)
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#@Html.FieldIdFor(model => model.BillingAddress.CountryId)").change(function () {
+                var selectedItem = $(this).val();
+                var ddlStates = $("#@Html.FieldIdFor(model => model.BillingAddress.StateProvinceId)");
+                var statesProgress = $("#billingstates-loading-progress");
+                statesProgress.show();
+                $.ajax({
+                    cache: false,
+                    type: "GET",
+                    url: "@(Url.RouteUrl("GetStatesByCountryId"))",
+                    data: { "countryId": selectedItem, "addEmptyStateIfRequired": "true" },
+                    async: false,
+                    success: function (data) {
+                        ddlStates.html('');
+                        $.each(data, function (id, option) {
+                            ddlStates.append($('<option></option>').val(option.id).html(option.name));
+                        });
+                        statesProgress.hide();
+                        //adjustShippingMethod(); //AjaxSipmentMethods
+                        adjustPaymentMethod(); //AjaxPaymentMethods
+                    },
+                    error: function (xhr, ajaxOptions, thrownError) {
+                        alert('Failed to retrieve states.');
+                        statesProgress.hide();
+                    }
+                });
+            });
+        });
+    </script>
+}

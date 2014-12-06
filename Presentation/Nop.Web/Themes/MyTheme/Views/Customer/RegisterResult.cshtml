@@ -1,0 +1,29 @@
+﻿@model RegisterResultModel
+@using Nop.Web.Models.Customer;
+@{
+    Layout = "~/Views/Shared/_Head.Login.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Register").Text);
+
+    //continue URL
+    var continueUrl = "";
+    if (!String.IsNullOrEmpty(this.Context.Request.QueryString["returnUrl"]))
+    {
+        continueUrl = this.Context.Request.QueryString["returnUrl"];
+    }
+    else
+    {
+        continueUrl = Url.RouteUrl("HomePage");
+    }
+}
+
+<div class="login-form">
+    <div class="login-header-tip">
+        <span class="fl">@Model.Result</span>
+    </div>
+
+    <div class="buttons">
+        <input type="button" class="btn btn-primary" onclick="location.href='@(continueUrl)    '" value="@T("Account.Register.Result.Continue")" />
+    </div>
+</div>

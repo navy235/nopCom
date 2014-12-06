@@ -1,0 +1,83 @@
+﻿@model ProductDetailsModel.ProductPriceModel
+@using Nop.Core
+@using Nop.Core.Domain.Tax
+@using Nop.Core.Infrastructure
+@using Nop.Web.Extensions
+@using Nop.Web.Models.Catalog;
+@using System.Globalization;
+@using System.Text.RegularExpressions;
+@{
+    string pattern = "(?<val>(\\d+[\\s\\,\\.]?)+)";
+    string replacement = String.Format("<span class=\"price-val-for-dyn-upd-{0}\">${{val}}</span> ", Model.ProductId);  
+}
+@if (Model.DynamicPriceUpdate)
+{
+    <script type="text/javascript">
+        var priceValForDynUpd_@(Model.ProductId) = @(((float)(Model.PriceValue != Model.PriceWithDiscountValue ? Model.PriceWithDiscountValue : Model.PriceValue)).ToString(new CultureInfo("en-US")));
+    </script>
+}
+
+
+@if (Model.CustomerEntersPrice)
+{
+
+}
+else if (Model.CallForPrice)
+{
+    <div class="product-price call-for-price">
+        <span>@T("Products.CallForPrice")</span>
+    </div>
+}
+else
+{
+
+    <span class="pro-price" @if (String.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+                            { <text>itemprop="price"</text> } >
+        @if (Model.DynamicPriceUpdate && !Model.HidePrices && String.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+        {
+            <em>@Html.Raw(Regex.Replace(Model.Price, pattern, replacement))
+            </em>
+        }
+        else
+        {<em>
+                @Html.Raw(Model.Price)</em>
+        }
+    </span>
+
+        if (!String.IsNullOrWhiteSpace(Model.OldPrice))
+        {
+    <span class="pro-market"><del>@Model.OldPrice</del></span>
+  
+        }
+        if (!String.IsNullOrWhiteSpace(Model.PriceWithDiscount))
+        {
+
+    <div class="product-price discounted-price">
+        <label>@T("Products.Price.WithDiscount"):</label>
+        <span itemprop="price">
+            @if (Model.DynamicPriceUpdate && !Model.HidePrices)
+            {
+                @Html.Raw(Regex.Replace(Model.PriceWithDiscount, pattern, replacement))
+            }
+            else
+            {
+                @Html.Raw(Model.PriceWithDiscount)
+            }
+        </span>
+    </div>
+        }
+        if (Model.DisplayTaxShippingInfo)
+        {
+            var inclTax = EngineContext.Current.Resolve<IWorkContext>().TaxDisplayType == TaxDisplayType.IncludingTax;
+            //tax info is already included in the price (incl/excl tax). that's why we display only shipping info here
+            //of course, you can modify appropriate locales to include VAT info there
+    <div class="tax-shipping-info">
+        @T(inclTax ? "Products.Price.TaxShipping.InclTax" : "Products.Price.TaxShipping.ExclTax", Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("shippinginfo") }))
+    </div>
+        }
+        if (!String.IsNullOrEmpty(Model.CurrencyCode))
+        {
+    <meta itemprop="priceCurrency" content="@Model.CurrencyCode" />
+        }
+}
+

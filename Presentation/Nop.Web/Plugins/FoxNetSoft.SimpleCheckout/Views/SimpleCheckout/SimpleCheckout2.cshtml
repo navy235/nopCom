@@ -1,0 +1,314 @@
+﻿@model SimpleCheckoutModel
+@using Nop.Core.Domain.Orders;
+@using Nop.Web.Models.Checkout;
+@using Nop.Web.Models.Common;
+@using FoxNetSoft.Plugin.Misc.SimpleCheckout.Models;
+@{
+    Layout = "~/Views/Shared/_ColumnsOne.cshtml";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.Checkout").Text);
+    Html.AddCssFileParts("~/Plugins/FoxNetSoft.SimpleCheckout/Styles/styles2.css");
+    string shippingoptiontag = "";
+    if (!Model.RequiresShipping)
+    {
+        shippingoptiontag = "style=display:none";
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("input[name='shippingoption']").change(function() 
+        {
+            adjustOrderSummary();
+            $('#message-error-shipping ul').html('');
+            $('#message-error ul').html('');
+        });
+        $("input[name='paymentmethod']").change(function() 
+        {
+            adjustOrderSummary();
+            adjustPaymentInfo();
+            $('#message-error-payment ul').html('');
+            $('#message-error ul').html('');
+        });
+    });
+
+    function sc_AjaxShippingMethod_success(response) {
+        var ddlwarning = $('#message-error-shipping ul');
+        ddlwarning.html('');
+        if (response.warnings) {
+            $.each(response.warnings, function (id, idata) {
+                ddlwarning.append('<li>' + idata + '</li>');
+            });
+        }
+        if (response.shippingmethods) {
+            if (response.addressid > 0) {
+                $("#@Html.FieldIdFor(model => model.ShippingAddress.Id)").val(response.addressid);
+            }
+            //var ddlshippingoption = $('#shippingoption');
+            var ddlshippingoption = $('.shipping-method .method-list');
+            ddlshippingoption.html('');
+            $.each(response.shippingmethods, function (id, idata) {
+                var newoption = '<li><div class="method-name">';
+                newoption = newoption + '<input id="shippingoption_' + id + '" type="radio" name="shippingoption" value="' + idata.Name + '___' + idata.ShippingRateComputationMethodSystemName + '" checked="' + idata.Selected + '" />';
+                newoption = newoption + '<label for="shippingoption_' + id + '">' + idata.Name;
+                if (idata.Fee && idata.Fee.length > 0)
+                    newoption = newoption + '(' + idata.Fee + ')';
+                newoption = newoption + '</label></div>';
+                /*if (idata.Description && idata.Description.length>0)
+                    newoption=newoption+'<div class="method-description">'+idata.Description+'</div>';
+                   */
+                newoption = newoption + '</li>';
+                ddlshippingoption.append(newoption);
+            });
+            $("input[name='shippingoption']").change(function () {
+                adjustOrderSummary();
+                $('#message-error-shipping ul').html('');
+                $('#message-error ul').html('');
+            });
+            adjustOrderSummary();
+            $('#message-error-shipping ul').html('');
+            $('#message-error ul').html('');
+        }
+        $("#shipmentmethods-loading-progress").hide();
+        return true;
+    }
+    function sc_AjaxPaymentMethod_success(response) {
+        var ddlwarning = $('#message-error-payment ul');
+        ddlwarning.html('');
+        if (response.warnings) {
+            $.each(response.warnings, function (id, idata) {
+                ddlwarning.append('<li>' + idata + '</li>');
+            });
+        }
+        if (response.paymentmethods) {
+            if (response.addressid > 0) {
+                if ($("#@Html.FieldIdFor(model => model.UseDifferentAddressForBilling)").prop("checked")) {
+                    $("#@Html.FieldIdFor(model => model.BillingAddress.Id)").val(response.addressid);
+                }
+                else {
+                    $("#@Html.FieldIdFor(model => model.ShippingAddress.Id)").val(response.addressid);
+                }
+            }
+            //                    var ddlpaymentmethod = $('#paymentmethod');
+            var ddlpaymentmethod = $('.payment-method .method-list');
+            ddlpaymentmethod.html('');
+            $.each(response.paymentmethods, function (id, idata) {
+
+                var newoption = '<li><div class="method-name">';
+                if (idata.LogoUrl && idata.LogoUrl.length > 0)
+                    newoption = newoption + '<div class="payment-logo"><img src="' + idata.LogoUrl + '" alt="' + idata.Name + '" /></div>';
+                newoption = newoption + '<div class="payment-details">';
+                newoption = newoption + '<input id="paymentmethod_' + id + '" type="radio" name="paymentmethod" value="' + idata.PaymentMethodSystemName + '" checked="' + idata.Selected + '" />';
+                newoption = newoption + '<label for="paymentmethod_' + id + '">' + idata.Name;
+                if (idata.Fee && idata.Fee.length > 0)
+                    newoption = newoption + '(' + idata.Fee + ')';
+                newoption = newoption + '</label></div>';
+                newoption = newoption + '</div></li>';
+                ddlpaymentmethod.append(newoption);
+            });
+            $("input[name='paymentmethod']").change(function () {
+                adjustOrderSummary();
+                adjustPaymentInfo();
+                $('#message-error-payment ul').html('');
+                $('#message-error ul').html('');
+            });
+            adjustOrderSummary();
+            adjustPaymentInfo();
+            $('#message-error-payment ul').html('');
+            $('#message-error ul').html('');
+            //ddlpaymentmethod.change();
+        }
+        $("#paymentmethods-loading-progress").hide();
+        return true;
+    }
+
+    function sc_GetddlPaymentMethodValue() {
+        //return $("#paymentmethod").val();
+        return $("input[name='paymentmethod']:checked").val();
+    }
+    function sc_GetddlShippingMethodValue() {
+        //return $("#shippingoption").val();
+        return $("input[name='shippingoption']:checked").val();
+    }
+
+
+</script>
+
+<div class="page simple-checkout-page">
+    @Html.Partial(Model.GetViewPath("_SimpleCheckoutScript"), Model)
+    <div class="page-title">
+        <h1>@T("PageTitle.Checkout")</h1>
+    </div>
+    <div class="clear">
+    </div>
+    <div class="page-body simple-checkout-data">
+        @*@if (Model.IsGuest)
+        {
+        <div>
+            <p>@T("FoxNetSoft.Plugin.Misc.SimpleCheckout.MessageForLogin") <a href="@Url.RouteUrl("Login")" class="ico-login">@T("Account.Login")</a></p>
+        </div>
+        }*@
+           @using (Html.BeginRouteForm("Checkout", FormMethod.Post, new { id = "form-fns-simplecheckout"}))
+           {
+    <div class="page-body simple-checkout-data-left">
+                @Html.HiddenFor(model => model.isPaymentWorkflowRequired)               
+                @Html.HiddenFor(model => model.RequiresShipping)   
+                <table class="simple-checkout-table">
+                    @Html.Partial(Model.GetViewPath("_ShippingAddress"), Model)
+                    @if (Model.DiscountBox.Display || Model.GiftCardBox.Display)
+                    {
+                        @Html.Partial(Model.GetViewPath("_DiscountGift"), Model)
+                    }
+                    @if (Model.IsAllowCustomerToWriteComment)
+                    {
+                        <tr>
+                            <td>
+                               @Html.NopLabelFor(model => model.CustomerComment):
+                            </td>
+                            <td>
+                               @Html.TextAreaFor(model => model.CustomerComment)
+                            </td>
+                        </tr>  
+                    }                
+
+                        <tr>
+                            <td colspan="2" width="100%">                    
+                                <div class="clear">
+                                </div>
+                                <div class="message-error" id="message-error">
+                                    <ul>
+                                        @for (int i = 0; i < Model.Warnings.Count; i++)
+                                        {
+                                            <li>@Model.Warnings[i]</li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="message-error" id="message-error-shipping">
+                                    <ul>
+                                        @for (int i = 0; i < Model.WarningsShipping.Count; i++)
+                                        {
+                                            <li>@Model.WarningsShipping[i]</li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="message-error" id="message-error-payment">
+                                    <ul>
+                                        @for (int i = 0; i < Model.WarningsPayment.Count; i++)
+                                        {
+                                            <li>@Model.WarningsPayment[i]</li>
+                                        }
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                       <tr>
+                       <td colspan="2" width="100%">
+                            @if (!String.IsNullOrEmpty(Model.MinOrderTotalWarning))
+                            {
+                                <span class="min-order-warning">@Model.MinOrderTotalWarning</span>
+                            }
+                            else
+                            {
+                                if (Model.TermsOfServiceOnOrderConfirmPage)
+                                {
+                                    <div id="terms-of-service-warning-box" title="@T("Checkout.TermsOfService")" style="display:none;">
+                                        <p>@T("Checkout.TermsOfService.PleaseAccept")</p>
+                                    </div>
+                                    <div class="terms-of-service">
+                                        <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                        @T("Checkout.TermsOfService.IAccept")
+                                        <span class="read" onclick="javascript:OpenWindow('@Url.RouteUrl("TopicPopup", new { SystemName = "conditionsofUse" })', 450, 500, true)">@T("Checkout.TermsOfService.Read")</span>
+                                    </div>
+                                }
+                                <div class="buttons">
+                                    <input type="submit" name="save" value="@T("Checkout.ConfirmButton")" class="button-1 confirm-order-next-step-button" />
+                                </div>
+                            }
+                       </td>
+                       </tr>
+                </table>
+</div> 
+<div class="shipping-payment-method">
+               @*style="display:none">*@
+                <div class="shipping-method" @shippingoptiontag>
+                    <div class="shipping-title">
+                        <h1>@T("Checkout.SelectShippingMethod")</h1>
+                    </div>
+                    <div class="shipping-block">
+                        <span id="shipmentmethods-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                        <ul class="method-list">
+                             @for (int i = 0; i < Model.ShippingMethods.Count; i++)
+                             {
+                                var shippingMethod = Model.ShippingMethods[i];
+                                <li>
+                                <div class="method-name">
+                                    <input id="shippingoption_@(i)" type="radio" name="shippingoption" value="@(shippingMethod.Name)___@(shippingMethod.ShippingRateComputationMethodSystemName)" checked="@shippingMethod.Selected" />
+                                    <label for="shippingoption_@(i)">@shippingMethod.Name @(!String.IsNullOrEmpty(shippingMethod.Fee) ? " (" + shippingMethod.Fee + ")" : "")</label>
+                                    @*<label for="shippingoption_@(i)">@T("Checkout.SelectShippingMethod.MethodAndFee", shippingMethod.Name, shippingMethod.Fee)</label>*@
+                                    @*@shippingMethod.Name @(!String.IsNullOrEmpty(shippingMethod.Fee) ? " (" + shippingMethod.Fee + ")" : "")*@
+                                </div>
+                                @*@if (!String.IsNullOrEmpty(shippingMethod.Description))
+                                {
+                                    <div class="method-description">
+                                        @Html.Raw(shippingMethod.Description)
+                                    </div>
+                                }*@
+                                </li>
+                             }
+                        </ul>
+                    </div>
+               </div>
+                    @if (Model.isPaymentWorkflowRequired)
+                    { 
+                        <div class="payment-method">
+                            <div class="payment-title">
+                                <h1>@T("Checkout.SelectPaymentMethod")</h1>
+                            </div> 
+                           <div class="payment-block">
+                                @if (Model.DisplayRewardPoints && Model.PaymentMethods.Count > 0)
+                                {
+                                <div class="use-reward-points">
+                                    @Html.EditorFor(model => model.UseRewardPoints)
+                                    @string.Format(T("Checkout.UseRewardPoints").Text, Model.RewardPointsBalance, Model.RewardPointsAmount)
+                                </div>
+                                }
+                                <span id="paymentmethods-loading-progress" style="display: none;" class="please-wait">@T("Common.Wait...")</span>
+                                <ul class="method-list">
+                                @for (int i = 0; i < Model.PaymentMethods.Count; i++)
+                                {
+                                    var paymentMethod = Model.PaymentMethods[i];
+                                    var paymentMethodName = paymentMethod.Name;
+                                    if (!String.IsNullOrEmpty(paymentMethod.Fee))
+                                    {
+                                        //paymentMethodName = T("Checkout.SelectPaymentMethod.MethodAndFee", paymentMethodName, paymentMethod.Fee).Text;
+                                        paymentMethodName = paymentMethodName + " (" + paymentMethod.Fee + ")";
+                                    }
+                                    <li>
+                                        <div class="method-name">
+                                            @if (!String.IsNullOrEmpty(paymentMethod.LogoUrl))
+                                            {
+                                                <div class="payment-logo">
+                                                    <img src="@paymentMethod.LogoUrl" alt="@paymentMethodName" />
+                                                </div>
+                                            }
+                                            <div class="payment-details">
+                                                <input id="paymentmethod_@(i)" type="radio" name="paymentmethod" value="@(paymentMethod.PaymentMethodSystemName)" checked="@paymentMethod.Selected" />
+                                                <label for="paymentmethod_@(i)">@paymentMethodName</label>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+                                </ul>
+                            </div>
+                            <div class="simple-checkout-paymentinfo">
+	                        </div>                                               
+                        </div> 
+                    }
+</div>          
+           }
+    
+		<div class="simple-checkout-order-summary-body">
+			@*@Html.Action("OrderSummary", "ShoppingCart")*@
+		</div>
+    </div>
+</div>

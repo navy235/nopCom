@@ -1,0 +1,128 @@
+﻿@model ShoppingCartModel
+@using Nop.Core
+@using Nop.Core.Infrastructure
+@using Nop.Web.Models.ShoppingCart;
+@{
+    Layout = "";
+    //Html.AddCssFileParts("~/Plugins/FoxNetSoft.SimpleCheckout/Styles/stylesorder.css");       
+}
+<link href="@Url.Content("~/Plugins/FoxNetSoft.SimpleCheckout/Styles/stylesorder2.css")" rel="stylesheet" type="text/css" />
+<div class="order-summary-content">
+    @if (Model.Items.Count > 0)
+    {
+        if (Model.Warnings.Count > 0)
+        {
+        <div class="message-error">
+            <ul>
+                @for (int i = 0; i < Model.Warnings.Count; i++)
+                {
+                    <li>@Model.Warnings[i]</li>
+                }
+            </ul>
+        </div>
+        }
+
+        <div class="button-cart-top">
+            <h1>@T("account.customerorders")</h1>
+            <div class="minicarthead">
+                <input type="button" value="@T("common.edit")" class="editcart" onclick="setLocation('@(Url.RouteUrl("ShoppingCart"))')" />
+            </div>
+        </div>
+                                    
+@*we add enctype = "multipart/form-data" because "File upload" attribute control type requries it*@
+        using (Html.BeginRouteForm("ShoppingCart", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+        <table class="cart">
+            <colgroup>
+                @if (Model.ShowSku)
+                {
+                    <col width="1" />
+                }
+                @if (Model.ShowProductImages)
+                {
+                    <col width="1" />
+                }
+                <col />
+                <col width="1" />
+                <col width="1" />
+                <col width="1" />
+            </colgroup>
+             <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr class="cart-item-row">
+                        @if (Model.ShowSku)
+                        {
+                            <td class="sku nobr">
+                                @item.Sku
+                            </td>
+                        }
+                        @if (Model.ShowProductImages)
+                        {
+                            <td class="product-picture">
+                                <img alt="@item.Picture.AlternateText" src="@item.Picture.ImageUrl" title="@item.Picture.Title" />
+                            </td>
+                        }
+                        <td class="product">
+                            <a href="@Url.RouteUrl("Product", new { SeName = item.ProductSeName })" class="product-name">@item.ProductName</a>
+                            @if (!String.IsNullOrEmpty(item.AttributeInfo))
+                            {
+                                <div class="attributes">
+                                    @Html.Raw(item.AttributeInfo)
+                                </div>
+                            }
+                            @if (!String.IsNullOrEmpty(item.RecurringInfo))
+                            {
+                                <div class="recurring-info">
+                                    @Html.Raw(item.RecurringInfo)
+                                </div>
+                            }
+                            @if (item.Warnings.Count > 0)
+                            {
+                                <div class="message-error">
+                                    <ul>
+                                        @for (int i = 0; i < item.Warnings.Count; i++)
+                                        {
+                                            <li>@item.Warnings[i]</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+                        </td>
+                        <td class="unit-price nobr">
+                            <span class="product-unit-price">@item.UnitPrice</span>
+                        </td>
+                        <td class="qty nobr">
+                            <span>@item.Quantity</span>
+                        </td>
+                        <td class="subtotal nobr end">
+                            <span class="product-subtotal">@item.SubTotal</span>
+                            @if (!String.IsNullOrEmpty(item.Discount))
+                            {
+                                <div class="discount">
+                                    @T("ShoppingCart.ItemYouSave"): @item.Discount
+                                </div>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+                if (!String.IsNullOrEmpty(Model.CheckoutAttributeInfo))
+                {
+        <div class="selected-checkout-attributes">
+            @Html.Raw(Model.CheckoutAttributeInfo)
+        </div>
+                }
+        <div class="cart-footer">
+            <div class="totals">
+                @Html.Action("SimpleOrderTotals", "SimpleShoppingCart", new { isEditable = Model.IsEditable })
+            </div>
+        </div>
+        }
+    }
+    else
+    {
+        @T("ShoppingCart.CartIsEmpty")
+    }
+</div>

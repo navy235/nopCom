@@ -1,0 +1,8 @@
+﻿Group: Widgets
+FriendlyName: Login Background
+SystemName: Widgets.LoginBackground
+Version: 1.00
+SupportedVersions: 3.30
+Author: maitonn team
+DisplayOrder: 1
+FileName: Nop.Plugin.Widgets.LoginBackground.dll

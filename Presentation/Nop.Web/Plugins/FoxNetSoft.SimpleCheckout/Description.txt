@@ -1,0 +1,8 @@
+﻿Group: Misc
+FriendlyName: FoxNetSoft SimpleCheckout
+SystemName: FoxNetSoft.Plugin.Misc.SimpleCheckout
+Version: 4.00
+SupportedVersions: 3.30
+Author: FoxNetSoft
+DisplayOrder: 1
+FileName: FoxNetSoft.Plugin.Misc.SimpleCheckout.dll

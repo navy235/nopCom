@@ -1,0 +1,6 @@
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.AliPay\Description.txt
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.AliPay\Nop.Plugin.Payments.AliPay.dll
+F:\Own\NopCommerce\Sources\src\Presentation\Nop.Web\Plugins\Payments.AliPay\Nop.Plugin.Payments.AliPay.pdb
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.AliPay\obj\Release\ResolveAssemblyReference.cache
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.AliPay\obj\Release\Nop.Plugin.Payments.AliPay.dll
+F:\Own\NopCommerce\Sources\src\Plugins\Nop.Plugin.Payments.AliPay\obj\Release\Nop.Plugin.Payments.AliPay.pdb

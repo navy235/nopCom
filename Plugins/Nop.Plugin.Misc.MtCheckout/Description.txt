@@ -1,0 +1,8 @@
+﻿Group: Misc
+FriendlyName: MtCheckOut
+SystemName: Misc.MtCheckout
+Version: 1.00
+SupportedVersions: 3.30
+Author: navy
+DisplayOrder: 1
+FileName: Nop.Plugin.Misc.MtCheckout.dll
