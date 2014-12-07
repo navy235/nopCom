@@ -206,6 +206,13 @@
     height: 11px;
 }
 
+.icon-arrow-pink {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -411px -233px;
+    width: 10px;
+    height: 6px;
+}
+
 .trash-lid, .trash-can {
     position: absolute;
     left: 10px;
@@ -250,6 +257,47 @@
         background-position: -124px -156px;
     }
 
-     .btn-trash:hover .icon-trash-can {
+    .btn-trash:hover .icon-trash-can {
         background-position: -90px -156px;
+    }
+
+
+.btn-link {
+    border: 0;
+    background: transparent;
+    color: #1d94d1;
+}
+
+    .btn-link:hover {
+        color: #46acf9;
+    }
+
+.u-btn {
+    display: inline-block;
+    cursor: pointer;
+    padding: 0 20px;
+    height: 32px;
+    font: 14px/32px 'Microsoft Yahei';
+    background: 0;
+    border: 0;
+    text-align: center;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: background-color .3s ease-in;
+    transition: background-color .3s ease-in;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #f10180;
+    border-radius: 3px;
+    border: 1px solid #f10180;
+}
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #f43499;
     }
