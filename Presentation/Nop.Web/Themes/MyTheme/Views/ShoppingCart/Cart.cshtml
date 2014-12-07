@@ -49,6 +49,16 @@
             $(this).next().prop("checked", true);
             $('[name="updatecart"]').click();
         })
+
+        $('.btn-conpons-trigger').on('click', function () {
+            if ($(this).hasClass('trigged')) {
+                $('.order-coupons').removeClass('expanded');
+                $(this).removeClass("trigged")
+            } else {
+                $('.order-coupons').addClass('expanded');
+                $(this).addClass("trigged")
+            }
+        })
     })
 
 </script>
