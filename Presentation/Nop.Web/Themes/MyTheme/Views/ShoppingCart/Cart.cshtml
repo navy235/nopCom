@@ -39,11 +39,13 @@
 
 <script type="text/javascript">
     $(function () {
-        $('[data-role="numinput"]').numinput({
-            callback: function () {
-                $('[name="updatecart"]').click();
-            }
-        });
+        $.each($('[data-role="numinput"]'), function (index, item) {
+            $(item).numinput({
+                callback: function () {
+                    $('[name="updatecart"]').click();
+                }
+            });
+        })
 
         $('.btn-trash').on('click', function () {
             $(this).next().prop("checked", true);

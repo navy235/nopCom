@@ -204,11 +204,14 @@
 
         if (Model.IsEditable)
         {
+            var discountErr = !string.IsNullOrEmpty(Model.DiscountBox.Message);
+            var giftErr = !string.IsNullOrEmpty(Model.GiftCardBox.Message);
 
-            <div class="order-coupons">
+
+            <div class="order-coupons  @((discountErr||giftErr) ? "expanded" : "")">
                 <div class="order-coupons-hd">
                     <div class="order-coupons-trigger">
-                        <a class="btn-conpons-trigger">
+                        <a class="btn-conpons-trigger @((discountErr||giftErr) ? " trigged" : "")">
                             <span class="btn-conpons-trigger-text">使用优惠券</span>
                             <span class="u-icon icon-arrow-pink"></span>
                         </a>
@@ -217,8 +220,12 @@
                 <div class="order-coupons-bd">
                     <div class="order-coupons-tab">
                         <ul data-role="tab" class="clearfix">
-                            <li class="selected"><a data-toggle="tab" href="#discount-tab">@T("ShoppingCart.DiscountCouponCode.Button")</a></li>
-                            <li><a data-toggle="tab" href="#gift-tab">@T("ShoppingCart.GiftCardCouponCode.Button")</a></li>
+                            <li class="@((discountErr || (!discountErr&&!giftErr))?"selected":"")">
+                                <a data-toggle="tab" href="#discount-tab">@T("ShoppingCart.DiscountCouponCode.Button")</a>
+                            </li>
+                            <li class="@((giftErr&&!discountErr)?"selected":"")">
+                                <a data-toggle="tab" href="#gift-tab">@T("ShoppingCart.GiftCardCouponCode.Button")</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="pro-tab-content ">
@@ -263,6 +270,7 @@
             </div>
 
 
+            <!------按钮-------->
             <div class="order-ft-placeholder">
                 <div class="order-ft">
                     @if (Model.IsEditable)

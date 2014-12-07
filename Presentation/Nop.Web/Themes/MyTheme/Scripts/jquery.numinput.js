@@ -14,7 +14,7 @@
 		    var that = this;
 		    that.hide();
 
-		    var controlId = $(that).attr('id');
+		  
 		    var wrapper = $('<div class="num-container"></div>');
 		    var btnreduce = $('<span data-direction="reduce" class="num-reduce num-handle disabled"></span>');
 		    var inputtext = $('<em class="num-input">1</em>');
@@ -24,13 +24,13 @@
 				.append(inputtext)
 				.append(btnadd));
 
-
-		    wrapper.on('click', '.num-handle', proxy(changeNum, that, ps.callback));
+		    wrapper.on('click', '.num-handle', proxy(changeNum, that, ps.callback))
+		
 
 		    init();
 
 		    function init() {
-
+		        var controlId = $(that).attr('id');
 		        var currentValue = $('#' + controlId).val();
 		        if (currentValue == ps.min) {
 		            btnreduce.addClass('disabled');
@@ -48,7 +48,7 @@
 		    function changeNum(callback, e) {
 		        e.preventDefault();
 		        var target = $(e.currentTarget);
-
+		        var controlId = $(that).attr('id');
 		        var direction = target.data('direction');
 		        var currentValue = $('#' + controlId).val();
 		        if (target.hasClass('disabled')) {
