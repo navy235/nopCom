@@ -150,6 +150,133 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
             return _orderSettings.OnePageCheckoutEnabled;
         }
 
+
+        [NonAction]
+        protected CheckoutShippingAddressModel PrepareShippingAddressModel(int? selectedCountryId = null,
+            bool prePopulateNewAddressWithCustomerFields = false)
+        {
+            var model = new CheckoutShippingAddressModel();
+            //existing addresses
+            var addresses = _workContext.CurrentCustomer.Addresses
+                //allow shipping
+                .Where(a => a.Country == null || a.Country.AllowsShipping)
+                //enabled for the current store
+                .Where(a => a.Country == null || _storeMappingService.Authorize(a.Country))
+                .ToList();
+            foreach (var address in addresses)
+            {
+                var addressModel = new AddressModel();
+                addressModel.PrepareModel(address,
+                    false,
+                    _addressSettings);
+                model.ExistingAddresses.Add(addressModel);
+            }
+
+            //new address
+            model.NewAddress.CountryId = selectedCountryId;
+            model.NewAddress.PrepareModel(null,
+                false,
+                _addressSettings,
+                _localizationService,
+                _stateProvinceService,
+                () => _countryService.GetAllCountriesForShipping(),
+                prePopulateNewAddressWithCustomerFields,
+                _workContext.CurrentCustomer);
+            return model;
+        }
+
+
+        [NonAction]
+        protected CheckoutPaymentMethodModel PreparePaymentMethodModel(IList<ShoppingCartItem> cart)
+        {
+            var model = new CheckoutPaymentMethodModel();
+
+            //reward points
+            if (_rewardPointsSettings.Enabled && !cart.IsRecurring())
+            {
+                int rewardPointsBalance = _workContext.CurrentCustomer.GetRewardPointsBalance();
+                decimal rewardPointsAmountBase = _orderTotalCalculationService.ConvertRewardPointsToAmount(rewardPointsBalance);
+                decimal rewardPointsAmount = _currencyService.ConvertFromPrimaryStoreCurrency(rewardPointsAmountBase, _workContext.WorkingCurrency);
+                if (rewardPointsAmount > decimal.Zero &&
+                    _orderTotalCalculationService.CheckMinimumRewardPointsToUseRequirement(rewardPointsBalance))
+                {
+                    model.DisplayRewardPoints = true;
+                    model.RewardPointsAmount = _priceFormatter.FormatPrice(rewardPointsAmount, true, false);
+                    model.RewardPointsBalance = rewardPointsBalance;
+                }
+            }
+
+            //filter by country
+            int filterByCountryId = 0;
+            if (_addressSettings.CountryEnabled &&
+                _workContext.CurrentCustomer.BillingAddress != null &&
+                _workContext.CurrentCustomer.BillingAddress.Country != null)
+            {
+                filterByCountryId = _workContext.CurrentCustomer.BillingAddress.Country.Id;
+            }
+
+            var boundPaymentMethods = _paymentService
+                .LoadActivePaymentMethods(_workContext.CurrentCustomer.Id, _storeContext.CurrentStore.Id, filterByCountryId)
+                .Where(pm => pm.PaymentMethodType == PaymentMethodType.Standard || pm.PaymentMethodType == PaymentMethodType.Redirection)
+                .ToList();
+            foreach (var pm in boundPaymentMethods)
+            {
+                if (cart.IsRecurring() && pm.RecurringPaymentType == RecurringPaymentType.NotSupported)
+                    continue;
+
+                var pmModel = new CheckoutPaymentMethodModel.PaymentMethodModel()
+                {
+                    Name = pm.GetLocalizedFriendlyName(_localizationService, _workContext.WorkingLanguage.Id),
+                    PaymentMethodSystemName = pm.PluginDescriptor.SystemName,
+                    LogoUrl = pm.PluginDescriptor.GetLogoUrl(_webHelper)
+                };
+                //payment method additional fee
+                decimal paymentMethodAdditionalFee = _paymentService.GetAdditionalHandlingFee(cart, pm.PluginDescriptor.SystemName);
+                decimal rateBase = _taxService.GetPaymentMethodAdditionalFee(paymentMethodAdditionalFee, _workContext.CurrentCustomer);
+                decimal rate = _currencyService.ConvertFromPrimaryStoreCurrency(rateBase, _workContext.WorkingCurrency);
+                if (rate > decimal.Zero)
+                    pmModel.Fee = _priceFormatter.FormatPaymentMethodAdditionalFee(rate, true);
+
+                model.PaymentMethods.Add(pmModel);
+            }
+
+            //find a selected (previously) payment method
+            var selectedPaymentMethodSystemName = _workContext.CurrentCustomer.GetAttribute<string>(
+                SystemCustomerAttributeNames.SelectedPaymentMethod,
+                _genericAttributeService, _storeContext.CurrentStore.Id);
+            if (!String.IsNullOrEmpty(selectedPaymentMethodSystemName))
+            {
+                var paymentMethodToSelect = model.PaymentMethods.ToList()
+                    .Find(pm => pm.PaymentMethodSystemName.Equals(selectedPaymentMethodSystemName, StringComparison.InvariantCultureIgnoreCase));
+                if (paymentMethodToSelect != null)
+                    paymentMethodToSelect.Selected = true;
+            }
+            //if no option has been selected, let's do it for the first one
+            if (model.PaymentMethods.FirstOrDefault(so => so.Selected) == null)
+            {
+                var paymentMethodToSelect = model.PaymentMethods.FirstOrDefault();
+                if (paymentMethodToSelect != null)
+                    paymentMethodToSelect.Selected = true;
+            }
+
+            return model;
+        }
+
+
+        protected bool IsPaymentWorkflowRequired(IList<ShoppingCartItem> cart, bool ignoreRewardPoints = false)
+        {
+            bool result = true;
+
+            //check whether order total equals zero
+            decimal? shoppingCartTotalBase = _orderTotalCalculationService.GetShoppingCartTotal(cart, ignoreRewardPoints);
+            if (shoppingCartTotalBase.HasValue && shoppingCartTotalBase.Value == decimal.Zero)
+                result = false;
+            return result;
+        }
+
+
+        #region configure
+
         [AdminAuthorize]
         [ChildActionOnly]
         public ActionResult Configure()
@@ -191,6 +318,8 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
         }
 
 
+        #endregion
+
         public ActionResult Index()
         {
             var mtCheckoutSettings = _settingService.LoadSetting<MtCheckoutSettings>(_storeContext.CurrentStore.Id);
@@ -211,11 +340,39 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
                 if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
                     return new HttpUnauthorizedResult();
 
+                var model = new MtCheckoutModel();
 
+                model.CheckoutShippingAddressModel=  PrepareShippingAddressModel(prePopulateNewAddressWithCustomerFields: true);
 
+                //bool isPaymentWorkflowRequired = IsPaymentWorkflowRequired(cart, true);
 
+                //if (!isPaymentWorkflowRequired)
+                //{
+                //    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
+                //        SystemCustomerAttributeNames.SelectedPaymentMethod, null, _storeContext.CurrentStore.Id);
+                //    return RedirectToRoute("CheckoutPaymentInfo");
+                //}
 
-                return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index");
+                //model
+                var paymentMethodModel = PreparePaymentMethodModel(cart);
+
+                model.CheckoutPaymentMethodModel = paymentMethodModel;
+
+                //if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
+                //    paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)
+                //{
+                //    //if we have only one payment method and reward points are disabled or the current customer doesn't have any reward points
+                //    //so customer doesn't have to choose a payment method
+
+                //    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
+                //        SystemCustomerAttributeNames.SelectedPaymentMethod,
+                //        paymentMethodModel.PaymentMethods[0].PaymentMethodSystemName,
+                //        _storeContext.CurrentStore.Id);
+                //    return RedirectToRoute("CheckoutPaymentInfo");
+                //}
+            
+
+                return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
             }
             else
             {

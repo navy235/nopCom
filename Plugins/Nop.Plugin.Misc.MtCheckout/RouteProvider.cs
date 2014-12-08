@@ -5,7 +5,7 @@ using Nop.Web.Framework.Mvc.Routes;
 using Nop.Web.Framework.Localization;
 
 
-namespace Nop.Plugin.Misc.MtCheckOut
+namespace Nop.Plugin.Misc.MtCheckout
 {
     public partial class RouteProvider : IRouteProvider
     {

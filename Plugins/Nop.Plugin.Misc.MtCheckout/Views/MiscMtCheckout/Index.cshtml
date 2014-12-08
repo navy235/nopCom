@@ -1,9 +1,12 @@
-﻿@using Nop.Web.Models.Customer;
+﻿@using Nop.Plugin.Misc.MtCheckout.Models;
+@model MtCheckoutModel
 @{
     Layout = "~/Views/Shared/_ColumnsOne.cshtml";
 
     //title
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
+
+    Html.AppendCssFileParts("~/Plugins/Misc.MtCheckout/Content/checkout.css");
 }
 
 <div class="check-steps">
@@ -25,11 +28,150 @@
 <!----------收货地址------------>
 
 
+<div class="mt-box address-box ">
+    <div class="box-hd">
+        <h2 class="box-hd-title">收货信息</h2>
+    </div>
+    <div class="box-bd">
+        <div class="address-box-cnt ">
+            <div class="address-list-wrapper ">
+                <div class="m-address">
+                    <ul class="address-list clearfix">
+                        @for (var i = 0; i < Model.CheckoutShippingAddressModel.ExistingAddresses.Count; i++)
+                        {
+                            var item = Model.CheckoutShippingAddressModel.ExistingAddresses[i];
 
+                            <li class="address-item ">
+                                <div class="address-inner @(i==0?"current default":"")">
+                                    <div class="address-info-item address-info-title">
+                                        <span class="u-icon icon-address-member"></span>
+                                        <p class="address-text">
+                                            <span class="address-name" title="@(item.FirstName+item.LastName)">@(item.FirstName + item.LastName)</span><span class="member-phone">@(item.PhoneNumber)</span>
+                                        </p>
+                                    </div>
+                                    <div class="address-info-item address-info-local" title="@item.Address1">
+                                        <span class="u-icon icon-address-local"></span>
+                                        <address class="address-text">@item.Address1</address>
+                                    </div>
+                                    <div class="address-info-item address-info-delivery-time">
+                                        <span class="u-icon icon-address-time"></span>
+                                        <p class="address-text">
+                                            <span>不限时间</span>
+                                        </p>
+                                    </div>
+                                    <span class="default-address-text">默认地址</span>
+                                    <span class="u-icon icon-corner-tick"></span>
+                                    <div class="address-info-actions">
+                                        <a href="###" role="button" class="ui-btn btn-address btn-address-default ">设为默认</a>
+                                        <a href="###" role="button" class="ui-btn btn-address J_address_modify">修改</a>
+                                        <a href="###" role="button" class="ui-btn btn-address btn-address-del ">删除</a>
+                                    </div>
+
+                                </div>
+                            </li>
+                        }
+
+                        <li class="address-item address-item-add ">
+                            <div class="address-inner">
+                                <a class="add-address J_address_add_btn J_fake_a" href="###" mars_sead="address_new_radio">
+                                    <span class="u-icon icon-address-add"></span>
+                                    <p>添加地址</p>
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-box payment-box ">
+    <div class="box-hd">
+        <h2 class="box-hd-title">支付方式</h2>
+        <p class="box-hd-desc">
+            *&nbsp;推荐使用线上支付，更方便快捷
+        </p>
+    </div>
+    @{
+        var payModel = Model.CheckoutPaymentMethodModel;
+    }
+    @if (payModel.DisplayRewardPoints && payModel.PaymentMethods.Count > 0)
+    {
+        <div class="box-bd">
+            <div class="payment-group clearfix">
+                <div class="switch-group">
+                    <div class="mt-checkbox ">
+                        <div class="ui-checkbox">
+                            <input type="checkbox"
+                                   id="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)"
+                                   name="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)"
+                                   value="Model.CheckoutPaymentMethodModel.UseRewardPoints">
+                            <i class="icon-checkbox"></i>
+                        </div>
+                        <label class="ui-checkbox-label" for="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)">@T("checkout.userewardpointstitle")</label>
+                    </div>
+                </div>
+                <div class="m-wallet-tips">
+                    <i class="u-icon icon-wallet-tips-arrow"></i>
+                    <div class="wallet-tips-cnt">
+                        <span class="u-highlight">
+                            @T("checkout.rewardpointscount")
+                            <span class="m-price">
+                                <span class="u-price">@payModel.RewardPointsAmount</span>
+                            </span>
+                        </span>
+                        @*<span class="vip-payment-enough">（已足额支付）</span>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    @if (payModel.PaymentMethods.Count > 0)
+    {
+        <div class="payment-types">
+            @for (int i = 0; i < payModel.PaymentMethods.Count; i++)
+            {
+                var paymentMethod = payModel.PaymentMethods[i];
+                var paymentMethodName = paymentMethod.Name;
+                if (!String.IsNullOrEmpty(paymentMethod.Fee))
+                {
+                    paymentMethodName = T("Checkout.SelectPaymentMethod.MethodAndFee", paymentMethodName, paymentMethod.Fee).Text;
+                }
+                <div class="payment-item @(paymentMethod.Selected?"selected":"")">
+                    <div class="mt-radio">
+                        <div class="ui-radio @(paymentMethod.Selected?"checked":"")">
+                            <input type="radio" id="paymentmethod_@(i)" name="paymentmethod" value="@(paymentMethod.PaymentMethodSystemName)" checked="@paymentMethod.Selected">
+                            <label class="icon-radio" for="paymentmethod_@(i)">@paymentMethodName</label>
+                        </div>
+                        @if (!String.IsNullOrEmpty(paymentMethod.LogoUrl))
+                        {
+                            <label for="paymentmethod_@(i)" class="payment-logo">
+                                <img src="@paymentMethod.LogoUrl" alt="@paymentMethodName" />
+                            </label>
+                        }
+                        <label for="paymentmethod_@(i)" class="ui-radio-label">@paymentMethodName</label>
+                    </div>
+                </div>
+
+            }
+        </div>
+    }
+    else
+    {
+        <div class="message-error">
+            @T("Checkout.NoPaymentMethods")
+        </div>
+    }
+</div>
 
 <!----------支付方式------------>
-
-
 <!----------订单详细------------>
-@Html.Action("OrderSummary", "ShoppingCart")
+<div class="mt-box  ">
+    <div class="box-hd">
+        <h2 class="box-hd-title">订单详细</h2>
+    </div>
 
+    @Html.Action("OrderSummary", "ShoppingCart")
+
+</div>

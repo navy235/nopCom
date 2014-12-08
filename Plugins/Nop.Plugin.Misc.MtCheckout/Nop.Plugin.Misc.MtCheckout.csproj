@@ -91,6 +91,9 @@
     <Compile Include="RouteProvider.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\checkout.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Description.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -102,6 +105,7 @@
     <EmbeddedResource Include="Views\MiscMtCheckout\Index.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <Content Include="Views\Web.config" />
     <None Include="web.config" />
   </ItemGroup>
   <ItemGroup>
