@@ -189,7 +189,7 @@
 
 
 .hidden {
-    display: none!important;
+    display: none !important;
 }
 
 .ui-tooltips.warning {
@@ -467,3 +467,7 @@
         padding: 8px 20px;
         font-size: 16px;
     }
+
+
+
+

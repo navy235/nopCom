@@ -301,3 +301,90 @@
         color: #fff;
         background-color: #f43499;
     }
+
+
+.ui-checkbox,
+.ui-radio {
+    width: 20px;
+    height: 22px;
+    padding: 3px 0 2px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    display: inline;
+    float: left;
+}
+
+    .ui-checkbox input,
+    .ui-radio input {
+        position: absolute;
+        top: -40px;
+        left: -40px;
+        z-index: 1;
+    }
+
+    .ui-checkbox .icon-checkbox {
+        background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+        background-position: -307px -244px;
+        width: 17px;
+        height: 17px;
+    }
+
+
+    .ui-checkbox.checked .icon-checkbox {
+        background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+        background-position: -331px -244px;
+        width: 19px;
+        height: 16px;
+    }
+
+.ui-radio .icon-radio {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -355px -244px;
+    width: 16px;
+    height: 16px;
+}
+
+
+.ui-radio.checked .icon-radio {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -442px -244px;
+    width: 16px;
+    height: 16px;
+}
+
+
+.ui-checkbox .icon-checkbox,
+.ui-radio .icon-radio {
+    position: relative;
+    float: left;
+    line-height: 9999px;
+    overflow: hidden;
+}
+
+.ui-radio-label {
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    color: #333;
+    overflow: hidden;
+    zoom: 1;
+    padding-left: 10px;
+}
+
+.ui-checkbox-label {
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+    color: #333;
+    overflow: hidden;
+    zoom: 1;
+    padding-left: 7px;
+}
+
+.icon-wallet-tips-arrow {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -604px -207px;
+    width: 4px;
+    height: 10px;
+}

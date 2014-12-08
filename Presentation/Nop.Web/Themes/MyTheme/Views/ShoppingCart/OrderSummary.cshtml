@@ -67,9 +67,16 @@
 
                     </thead>
                     <tbody>
+
+                        @{
+        var rowIndex = 0;
+                        }
+
                         @foreach (var item in Model.Items)
                         {
-                            <tr class="product-row">
+                            rowIndex++;
+
+                            <tr class="product-row @((rowIndex==Model.Items.Count)?"last":"")">
 
                                 @if (Model.ShowSku)
                                 {
