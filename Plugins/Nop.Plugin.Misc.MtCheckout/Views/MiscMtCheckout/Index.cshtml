@@ -6,15 +6,14 @@
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
 }
 
-
 <div class="check-steps">
     <i class="check-steps-bg"></i>
     <ul class="check-steps-block">
         <li>
-            <span>查看购物袋</span>
+            <span>@T("Checkout.Progress.Cart")</span>
         </li>
         <li class="current mid">
-            <span>确认订单信息</span>
+            <span>@T("Checkout.Progress.Confirm")</span>
         </li>
         <li>
             <span>成功提交订单</span>
@@ -23,5 +22,14 @@
 </div>
 
 
+<!----------收货地址------------>
+
+
+
+
+<!----------支付方式------------>
+
+
+<!----------订单详细------------>
 @Html.Action("OrderSummary", "ShoppingCart")
 
