@@ -25,5 +25,6 @@ namespace Nop.Plugin.Misc.MtCheckout.Models
         public CheckoutPaymentMethodModel CheckoutPaymentMethodModel { get; set; }
 
 
+        public int DefaultAddress { get; set; }
     }
 }

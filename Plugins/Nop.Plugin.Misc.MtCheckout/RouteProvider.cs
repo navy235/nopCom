@@ -26,6 +26,12 @@ namespace Nop.Plugin.Misc.MtCheckout
             routes.Remove(item);
             routes.Insert(0, item);
 
+            routes.MapLocalizedRoute("Plugin.Misc.MtCheckout.CompleteMtPayment",
+               "CompleteMtPayment/",
+               new { controller = "MiscMtCheckout", action = "CompleteMtPayment" },
+               new[] { "Nop.Plugin.Misc.MtCheckout.Controllers" }
+          );
+
         }
         public int Priority
         {

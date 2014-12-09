@@ -83,8 +83,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\MiscMtCheckoutController.cs" />
-    <Compile Include="Models\MtCheckoutModel.cs" />
     <Compile Include="Models\ConfigurationModel.cs" />
+    <Compile Include="Models\MtCheckoutModel.cs" />
     <Compile Include="MtCheckoutPlugin.cs" />
     <Compile Include="MtCheckoutSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,6 +105,9 @@
     <EmbeddedResource Include="Views\MiscMtCheckout\Index.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <Content Include="Scripts\checkout.js">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Views\Web.config" />
     <None Include="web.config" />
   </ItemGroup>
@@ -138,7 +141,6 @@
   <ItemGroup>
     <Folder Include="Content\images\" />
     <Folder Include="Logger\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

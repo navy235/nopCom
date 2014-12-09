@@ -106,6 +106,13 @@
     display: block;
 }
 
+.icon-error {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -344px -207px;
+    width: 32px;
+    height: 32px;
+}
+
 .num-container {
     float: left;
     position: relative;
@@ -302,6 +309,21 @@
         background-color: #f43499;
     }
 
+.btn-secondary {
+    color: #e00078;
+    background-color: #fcedf2;
+    border: 1px solid #ffbde0;
+    border-radius: 3px;
+}
+
+.mt-checkbox,
+.mt-radio {
+    cursor: pointer;
+    padding: 5px 0;
+    zoom: 1;
+}
+
+
 
 .ui-checkbox,
 .ui-radio {
@@ -338,29 +360,29 @@
         height: 16px;
     }
 
-.ui-radio .icon-radio {
-    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
-    background-position: -355px -244px;
-    width: 16px;
-    height: 16px;
-}
+    .ui-radio .icon-radio {
+        background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+        background-position: -355px -244px;
+        width: 16px;
+        height: 16px;
+    }
 
 
-.ui-radio.checked .icon-radio {
-    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
-    background-position: -442px -244px;
-    width: 16px;
-    height: 16px;
-}
+    .ui-radio.checked .icon-radio {
+        background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+        background-position: -442px -244px;
+        width: 16px;
+        height: 16px;
+    }
 
 
-.ui-checkbox .icon-checkbox,
-.ui-radio .icon-radio {
-    position: relative;
-    float: left;
-    line-height: 9999px;
-    overflow: hidden;
-}
+    .ui-checkbox .icon-checkbox,
+    .ui-radio .icon-radio {
+        position: relative;
+        float: left;
+        line-height: 9999px;
+        overflow: hidden;
+    }
 
 .ui-radio-label {
     display: inline-block;
@@ -387,4 +409,11 @@
     background-position: -604px -207px;
     width: 4px;
     height: 10px;
+}
+
+.icon-success-small {
+    background-image: url(//s2.vipstatic.com/img/cart/te/4/commons/sprites.png?93cb16b6);
+    background-position: -505px -244px;
+    width: 16px;
+    height: 16px;
 }

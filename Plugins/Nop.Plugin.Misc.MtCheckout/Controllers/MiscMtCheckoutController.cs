@@ -274,6 +274,41 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
             return result;
         }
 
+        [NonAction]
+        protected CheckoutConfirmModel PrepareConfirmOrderModel(IList<ShoppingCartItem> cart)
+        {
+            var model = new CheckoutConfirmModel();
+            //terms of service
+            model.TermsOfServiceOnOrderConfirmPage = _orderSettings.TermsOfServiceOnOrderConfirmPage;
+            //min order amount validation
+            bool minOrderTotalAmountOk = _orderProcessingService.ValidateMinOrderTotalAmount(cart);
+            if (!minOrderTotalAmountOk)
+            {
+                decimal minOrderTotalAmount = _currencyService.ConvertFromPrimaryStoreCurrency(_orderSettings.MinOrderTotalAmount, _workContext.WorkingCurrency);
+                model.MinOrderTotalWarning = string.Format(_localizationService.GetResource("Checkout.MinOrderTotalAmount"), _priceFormatter.FormatPrice(minOrderTotalAmount, true, false));
+            }
+            return model;
+        }
+
+        [NonAction]
+        protected MtCheckoutModel PrepareMtCheckoutModel(IList<ShoppingCartItem> cart)
+        {
+            var model = new MtCheckoutModel();
+
+
+
+            model.CheckoutShippingAddressModel = PrepareShippingAddressModel(prePopulateNewAddressWithCustomerFields: true);
+
+            if (model.CheckoutShippingAddressModel.ExistingAddresses.Count > 0) {
+                model.DefaultAddress = model.CheckoutShippingAddressModel.ExistingAddresses.First().Id;
+            }
+
+            var paymentMethodModel = PreparePaymentMethodModel(cart);
+
+            model.CheckoutPaymentMethodModel = paymentMethodModel;
+            return model;
+        }
+
 
         #region configure
 
@@ -340,37 +375,7 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
                 if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
                     return new HttpUnauthorizedResult();
 
-                var model = new MtCheckoutModel();
-
-                model.CheckoutShippingAddressModel=  PrepareShippingAddressModel(prePopulateNewAddressWithCustomerFields: true);
-
-                //bool isPaymentWorkflowRequired = IsPaymentWorkflowRequired(cart, true);
-
-                //if (!isPaymentWorkflowRequired)
-                //{
-                //    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
-                //        SystemCustomerAttributeNames.SelectedPaymentMethod, null, _storeContext.CurrentStore.Id);
-                //    return RedirectToRoute("CheckoutPaymentInfo");
-                //}
-
-                //model
-                var paymentMethodModel = PreparePaymentMethodModel(cart);
-
-                model.CheckoutPaymentMethodModel = paymentMethodModel;
-
-                //if (_paymentSettings.BypassPaymentMethodSelectionIfOnlyOne &&
-                //    paymentMethodModel.PaymentMethods.Count == 1 && !paymentMethodModel.DisplayRewardPoints)
-                //{
-                //    //if we have only one payment method and reward points are disabled or the current customer doesn't have any reward points
-                //    //so customer doesn't have to choose a payment method
-
-                //    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
-                //        SystemCustomerAttributeNames.SelectedPaymentMethod,
-                //        paymentMethodModel.PaymentMethods[0].PaymentMethodSystemName,
-                //        _storeContext.CurrentStore.Id);
-                //    return RedirectToRoute("CheckoutPaymentInfo");
-                //}
-            
+                var model = PrepareMtCheckoutModel(cart);
 
                 return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
             }
@@ -379,5 +384,266 @@ namespace Nop.Plugin.Misc.MtCheckout.Controllers
                 return RedirectToRoute("Plugin.Misc.MtCheckout.OldCheckoutOnePage");
             }
         }
+
+
+        [HttpPost, ActionName("Index")]
+        [FormValueRequired("checkconfirm")]
+        public ActionResult CheckOutSubmit(FormCollection form)
+        {
+            var mtCheckoutSettings = _settingService.LoadSetting<MtCheckoutSettings>(_storeContext.CurrentStore.Id);
+
+            if (mtCheckoutSettings.Enabled)
+            {
+
+                #region base
+                var cart = _workContext.CurrentCustomer.ShoppingCartItems
+                    .Where(sci => sci.ShoppingCartType == ShoppingCartType.ShoppingCart)
+                    .Where(sci => sci.StoreId == _storeContext.CurrentStore.Id)
+                    .ToList();
+                if (cart.Count == 0)
+                    return RedirectToRoute("ShoppingCart");
+
+                if (!UseOnePageCheckout())
+                    return RedirectToRoute("Checkout");
+
+                if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
+                    return new HttpUnauthorizedResult();
+                #endregion
+
+
+
+                var model = new MtCheckoutModel();
+
+
+                #region address
+
+                int addressId = 0;
+
+                int.TryParse(form["addressId"], out addressId);
+
+                if (addressId > 0)
+                {
+                    var address = _workContext.CurrentCustomer.Addresses.FirstOrDefault(a => a.Id == addressId);
+                    _workContext.CurrentCustomer.BillingAddress = address;
+                    _workContext.CurrentCustomer.ShippingAddress = address;
+                    _customerService.UpdateCustomer(_workContext.CurrentCustomer);
+                }
+                else
+                {
+                    model = PrepareMtCheckoutModel(cart);
+                    return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
+                }
+
+                #endregion
+
+
+                #region shippingoption
+
+                var shippingoption = "In-Store Pickup___Shipping.FixedRate";
+
+                if (String.IsNullOrEmpty(shippingoption))
+                    throw new Exception("Selected shipping method can't be parsed");
+                var splittedOption = shippingoption.Split(new string[] { "___" }, StringSplitOptions.RemoveEmptyEntries);
+                if (splittedOption.Length != 2)
+                    throw new Exception("Selected shipping method can't be parsed");
+                string selectedName = splittedOption[0];
+                string shippingRateComputationMethodSystemName = splittedOption[1];
+
+                //find it
+                //performance optimization. try cache first
+                var shippingOptions = _workContext.CurrentCustomer.GetAttribute<List<ShippingOption>>(SystemCustomerAttributeNames.OfferedShippingOptions, _storeContext.CurrentStore.Id);
+                if (shippingOptions == null || shippingOptions.Count == 0)
+                {
+                    //not found? let's load them using shipping service
+                    shippingOptions = _shippingService
+                        .GetShippingOptions(cart, _workContext.CurrentCustomer.ShippingAddress, shippingRateComputationMethodSystemName, _storeContext.CurrentStore.Id)
+                        .ShippingOptions
+                        .ToList();
+                }
+                else
+                {
+                    //loaded cached results. let's filter result by a chosen shipping rate computation method
+                    shippingOptions = shippingOptions.Where(so => so.ShippingRateComputationMethodSystemName.Equals(shippingRateComputationMethodSystemName, StringComparison.InvariantCultureIgnoreCase))
+                        .ToList();
+                }
+
+                var shippingOption = shippingOptions
+                    .Find(so => !String.IsNullOrEmpty(so.Name) && so.Name.Equals(selectedName, StringComparison.InvariantCultureIgnoreCase));
+                if (shippingOption == null)
+                    throw new Exception("Selected shipping method can't be loaded");
+
+                //save
+                _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer, SystemCustomerAttributeNames.SelectedShippingOption, shippingOption, _storeContext.CurrentStore.Id);
+
+                #endregion
+
+
+                string paymentmethod = form["paymentmethod"];
+
+                bool useRewardPoints = false;
+
+                bool.TryParse(form["useRewardPoints"], out useRewardPoints);
+
+                //payment method 
+                if (String.IsNullOrEmpty(paymentmethod))
+                    throw new Exception("Selected payment method can't be parsed");
+
+                if (_rewardPointsSettings.Enabled)
+                {
+                    _genericAttributeService.SaveAttribute(_workContext.CurrentCustomer,
+                        SystemCustomerAttributeNames.UseRewardPointsDuringCheckout, useRewardPoints,
+                        _storeContext.CurrentStore.Id);
+                }
+
+                bool isPaymentWorkflowRequired = IsPaymentWorkflowRequired(cart);
+
+                if (!isPaymentWorkflowRequired)
+                {
+                    //payment is not required
+                    _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
+                        SystemCustomerAttributeNames.SelectedPaymentMethod, null, _storeContext.CurrentStore.Id);
+
+                    //支付流程不需要的时候改如何处理？
+
+                }
+
+                var paymentMethodInst = _paymentService.LoadPaymentMethodBySystemName(paymentmethod);
+                if (paymentMethodInst == null ||
+                    !paymentMethodInst.IsPaymentMethodActive(_paymentSettings) ||
+                    !_pluginFinder.AuthenticateStore(paymentMethodInst.PluginDescriptor, _storeContext.CurrentStore.Id))
+                    throw new Exception("Selected payment method can't be parsed");
+
+                //save
+                _genericAttributeService.SaveAttribute<string>(_workContext.CurrentCustomer,
+                    SystemCustomerAttributeNames.SelectedPaymentMethod, paymentmethod, _storeContext.CurrentStore.Id);
+
+
+                var paymentControllerType = paymentMethodInst.GetControllerType();
+                var paymentController = DependencyResolver.Current.GetService(paymentControllerType) as BasePaymentController;
+                var warnings = paymentController.ValidatePaymentForm(form);
+
+                foreach (var warning in warnings)
+                    ModelState.AddModelError("", warning);
+
+
+                if (ModelState.IsValid)
+                {
+                    //get payment info
+                    var paymentInfo = paymentController.GetPaymentInfo(form);
+                    //session save
+
+
+                    paymentInfo.StoreId = _storeContext.CurrentStore.Id;
+                    paymentInfo.CustomerId = _workContext.CurrentCustomer.Id;
+                    paymentInfo.PaymentMethodSystemName = _workContext.CurrentCustomer.GetAttribute<string>(
+                        SystemCustomerAttributeNames.SelectedPaymentMethod,
+                        _genericAttributeService, _storeContext.CurrentStore.Id);
+                    var placeOrderResult = _orderProcessingService.PlaceOrder(paymentInfo);
+
+                    if (placeOrderResult.Success)
+                    {
+                        var postProcessPaymentRequest = new PostProcessPaymentRequest()
+                        {
+                            Order = placeOrderResult.PlacedOrder
+                        };
+
+                        if (paymentMethodInst.PaymentMethodType == PaymentMethodType.Redirection)
+                        {
+                            return Redirect(string.Format("{0}CompleteMtPayment", _webHelper.GetStoreLocation()));
+                        }
+                        else
+                        {
+                            model = PrepareMtCheckoutModel(cart);
+
+                            return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
+                        }
+                        //else
+                        //{
+                        //    _paymentService.PostProcessPayment(postProcessPaymentRequest);
+                        //}
+                    }
+                    else
+                    {
+                        model = PrepareMtCheckoutModel(cart);
+
+                        return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
+                    }
+                }
+                else
+                {
+                    model = PrepareMtCheckoutModel(cart);
+
+                    return View("Nop.Plugin.Misc.MtCheckout.Views.MiscMtCheckout.Index", model);
+                }
+
+
+            }
+            else
+            {
+                return RedirectToRoute("Plugin.Misc.MtCheckout.OldCheckoutOnePage");
+            }
+
+
+        }
+
+
+        public ActionResult CompleteMtPayment()
+        {
+            try
+            {
+                //validation
+                if (!UseOnePageCheckout())
+                    return RedirectToRoute("HomePage");
+
+                if ((_workContext.CurrentCustomer.IsGuest() && !_orderSettings.AnonymousCheckoutAllowed))
+                    return new HttpUnauthorizedResult();
+
+                //get the order
+                var order = _orderService.SearchOrders(storeId: _storeContext.CurrentStore.Id,
+                customerId: _workContext.CurrentCustomer.Id, pageSize: 1)
+                    .FirstOrDefault();
+                if (order == null)
+                    return RedirectToRoute("HomePage");
+
+
+                var paymentMethod = _paymentService.LoadPaymentMethodBySystemName(order.PaymentMethodSystemName);
+                if (paymentMethod == null)
+                    return RedirectToRoute("HomePage");
+                if (paymentMethod.PaymentMethodType != PaymentMethodType.Redirection)
+                    return RedirectToRoute("HomePage");
+
+                //ensure that order has been just placed
+                if ((DateTime.UtcNow - order.CreatedOnUtc).TotalMinutes > 3)
+                    return RedirectToRoute("HomePage");
+
+
+                //Redirection will not work on one page checkout page because it's AJAX request.
+                //That's why we process it here
+                var postProcessPaymentRequest = new PostProcessPaymentRequest()
+                {
+                    Order = order
+                };
+
+                _paymentService.PostProcessPayment(postProcessPaymentRequest);
+
+                if (_webHelper.IsRequestBeingRedirected || _webHelper.IsPostBeingDone)
+                {
+                    //redirection or POST has been done in PostProcessPayment
+                    return Content("Redirected");
+                }
+                else
+                {
+                    //if no redirection has been done (to a third-party payment page)
+                    //theoretically it's not possible
+                    return RedirectToRoute("CheckoutCompleted", new { orderId = order.Id });
+                }
+            }
+            catch (Exception exc)
+            {
+                _logger.Warning(exc.Message, exc, _workContext.CurrentCustomer);
+                return Content(exc.Message);
+            }
+        }
+
     }
 }

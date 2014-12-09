@@ -7,6 +7,9 @@
     Html.AddTitleParts(T("PageTitle.Checkout").Text);
 
     Html.AppendCssFileParts("~/Plugins/Misc.MtCheckout/Content/checkout.css");
+
+    Html.AppendScriptParts("~/Plugins/Misc.MtCheckout/Scripts/checkout.js");
+
 }
 
 <div class="check-steps">
@@ -24,154 +27,285 @@
     </ul>
 </div>
 
+@using (Html.BeginForm())
+{
+    <!----------收货地址------------>
+    <div class="mt-box address-box ">
+        <div class="box-hd">
+            <h2 class="box-hd-title">收货信息</h2>
+        </div>
+        <div class="box-bd">
+            <div class="address-box-cnt ">
+                <div class="address-list-wrapper ">
+                    <div class="m-address">
+                        <ul class="address-list clearfix">
+                            @for (var i = 0; i < Model.CheckoutShippingAddressModel.ExistingAddresses.Count; i++)
+                            {
+                                var item = Model.CheckoutShippingAddressModel.ExistingAddresses[i];
 
-<!----------收货地址------------>
-
-
-<div class="mt-box address-box ">
-    <div class="box-hd">
-        <h2 class="box-hd-title">收货信息</h2>
-    </div>
-    <div class="box-bd">
-        <div class="address-box-cnt ">
-            <div class="address-list-wrapper ">
-                <div class="m-address">
-                    <ul class="address-list clearfix">
-                        @for (var i = 0; i < Model.CheckoutShippingAddressModel.ExistingAddresses.Count; i++)
-                        {
-                            var item = Model.CheckoutShippingAddressModel.ExistingAddresses[i];
-
-                            <li class="address-item ">
-                                <div class="address-inner @(i==0?"current default":"")">
-                                    <div class="address-info-item address-info-title">
-                                        <span class="u-icon icon-address-member"></span>
-                                        <p class="address-text">
-                                            <span class="address-name" title="@(item.FirstName+item.LastName)">@(item.FirstName + item.LastName)</span><span class="member-phone">@(item.PhoneNumber)</span>
-                                        </p>
+                                <li class="address-item ">
+                                    <div class="address-inner @(item.Id == Model.DefaultAddress ? "default current" : "")">
+                                        <div class="address-info-item address-info-title">
+                                            <span class="u-icon icon-address-member"></span>
+                                            <p class="address-text">
+                                                <span class="address-name" title="@(item.LastName + item.FirstName)">@(item.LastName + item.FirstName)</span><span class="member-phone">@(item.PhoneNumber)</span>
+                                            </p>
+                                        </div>
+                                        <div class="address-info-item address-info-local" title="@item.Address1">
+                                            <span class="u-icon icon-address-local"></span>
+                                            <address class="address-text">@item.Address1</address>
+                                        </div>
+                                        <div class="address-info-item address-info-delivery-time">
+                                            <span class="u-icon icon-address-time"></span>
+                                            <p class="address-text">
+                                                <span>不限时间</span>
+                                            </p>
+                                        </div>
+                                        <span class="default-address-text">默认地址</span>
+                                        <span class="u-icon icon-corner-tick"></span>
+                                        <div class="address-info-actions">
+                                            <a href="###" role="button" class="ui-btn btn-address btn-address-default">设为默认</a>
+                                            <a href="###" role="button" class="ui-btn btn-address btn-address-modify">修改</a>
+                                            <a href="###" role="button" class="ui-btn btn-address btn-address-del">删除</a>
+                                        </div>
+                                        <input type="radio" name="addressId" class="hide"  value="@item.Id" checked="@(item.Id == Model.DefaultAddress ? "checked" : "")"/>
                                     </div>
-                                    <div class="address-info-item address-info-local" title="@item.Address1">
-                                        <span class="u-icon icon-address-local"></span>
-                                        <address class="address-text">@item.Address1</address>
-                                    </div>
-                                    <div class="address-info-item address-info-delivery-time">
-                                        <span class="u-icon icon-address-time"></span>
-                                        <p class="address-text">
-                                            <span>不限时间</span>
-                                        </p>
-                                    </div>
-                                    <span class="default-address-text">默认地址</span>
-                                    <span class="u-icon icon-corner-tick"></span>
-                                    <div class="address-info-actions">
-                                        <a href="###" role="button" class="ui-btn btn-address btn-address-default ">设为默认</a>
-                                        <a href="###" role="button" class="ui-btn btn-address J_address_modify">修改</a>
-                                        <a href="###" role="button" class="ui-btn btn-address btn-address-del ">删除</a>
-                                    </div>
+                                </li>
+                            }
 
+                            <li class="address-item address-item-add ">
+                                <div class="address-inner">
+                                    <a class="add-address" href="###">
+                                        <span class="u-icon icon-address-add"></span>
+                                        <p>添加地址</p>
+                                    </a>
+                                </div>
+                                <div class="mt-modal modify-address-modal">
+                                    <div class="modal-inner">
+                                        <div class="modal-cnt">
+                                            <h2 class="modify-address-title">收货信息</h2>
+                                            <input type="hidden" name="id" value="">
+                                            <div class="form-item form-title-item J_form_item z-form-item-error z-form-item-error-tooltips">
+                                                <input type="text" class="u-ipt" placeholder="收货人姓名" name="consignee" value="" autofocus="true" mars_sead="address_name_input">
+                                                <div class="m-tooltips tooltips-left-arrows tooltips-error">
+                                                    <div class="tooltips-arrows-wrapper">
+                                                        <div class="tooltips-arrows">
+                                                            <span class="tooltips-arrow-border">◆</span>
+                                                            <span class="tooltips-arrow-bg">◆</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tooltips-cnt">
+                                                        <div class="m-tips tips-small">
+                                                            <i class="u-icon tips-icon icon-error-small"></i>
+                                                            <div class="tips-cnt">
+                                                                <p class="tips-text J_tips_txt">请输入收货人姓名</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-item form-phone-item J_form_item">
+                                                <input type="text" class="u-ipt" placeholder="手机号 或 区号-固话" name="phone" value="" mars_sead="address_phone_input">
+                                                <div class="m-tooltips tooltips-left-arrows tooltips-error">
+                                                    <div class="tooltips-arrows-wrapper">
+                                                        <div class="tooltips-arrows">
+                                                            <span class="tooltips-arrow-border">◆</span>
+                                                            <span class="tooltips-arrow-bg">◆</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tooltips-cnt">
+                                                        <div class="m-tips tips-small">
+                                                            <i class="u-icon tips-icon icon-error-small"></i>
+                                                            <div class="tips-cnt">
+                                                                <p class="tips-text J_tips_txt"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-item form-address-detail-item J_form_item">
+                                                <textarea class="u-textarea address-textarea" placeholder="路名、门牌号。请勿再次填写省市区" name="address" mars_sead="address_detail_input"></textarea>
+                                                <div class="m-tooltips tooltips-left-arrows tooltips-error address-tooltips">
+                                                    <div class="tooltips-arrows-wrapper">
+                                                        <div class="tooltips-arrows">
+                                                            <span class="tooltips-arrow-border">◆</span>
+                                                            <span class="tooltips-arrow-bg">◆</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tooltips-cnt">
+                                                        <div class="m-tips tips-small">
+                                                            <i class="u-icon tips-icon icon-error-small"></i>
+                                                            <div class="tips-cnt">
+                                                                <p class="tips-text J_tips_txt"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-item form-shipping-time-item J_form_item">
+                                                <input type="hidden" name="shipping_time" value="1">
+                                                <div class="m-dropdown delivery-time-dropdown J_shipping_time_dropdown" mars_sead="address_time_sel">
+                                                    <div class="dropdown-hd">
+                                                        <span class="dropdown-hd-title">收货时间 - 不限时间</span>
+                                                        <span class="u-icon dropdown-hd-arrow-icon"></span>
+                                                    </div>
+                                                    <div class="dropdown-bd">
+                                                        <ul class="dropdown-list">
+                                                            <li class="dropdown-list-item">
+                                                                <span class="dropdown-option z-dropdown-option-current" data-text="收货时间 - 不限时间" data-value="1">不限时间</span>
+                                                            </li>
+                                                            <li class="dropdown-list-item">
+                                                                <span class="dropdown-option" data-text="收货时间 - 周一至周五" data-value="3">周一至周五</span>
+                                                            </li>
+                                                            <li class="dropdown-list-item">
+                                                                <span class="dropdown-option" data-text="收货时间 - 周六日/节假日" data-value="2">周六日/节假日</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="m-tooltips tooltips-left-arrows tooltips-error">
+                                                    <div class="tooltips-arrows-wrapper">
+                                                        <div class="tooltips-arrows">
+                                                            <span class="tooltips-arrow-border">◆</span>
+                                                            <span class="tooltips-arrow-bg">◆</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tooltips-cnt">
+                                                        <div class="m-tips tips-small">
+                                                            <i class="u-icon tips-icon icon-error-small"></i>
+                                                            <div class="tips-cnt">
+                                                                <p class="tips-text J_tips_txt"></p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-item-actions">
+                                                <a href="###" role="button" class="u-btn btn-primary J_address_save J_fake_a" mars_sead="address_save_btn">
+                                                    <span class="btn-text">保存</span>
+                                                    <span class="btn-loading-text bg-loading-gray-small">加载中...</span>
+                                                </a>
+                                                <a href="###" role="button" class="u-btn btn-link J_address_cancel J_fake_a" mars_sead="address_notsave_btn">取消</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <a href="###" class="btn-modal-close J_address_cancel J_fake_a" title="关闭" role="button" mars_sead="address_notsave_btn">×</a>
+                                    <div class="modal-inner-mask"></div>
+                                    <div class="address-save-success-tips">
+                                        <div class="m-tips tips-small">
+                                            <span class="u-icon tips-icon icon-success-small"></span>
+                                            <div class="tips-cnt">
+                                                <p class="tips-text">
+                                                    成功保存地址！
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </li>
-                        }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                        <li class="address-item address-item-add ">
-                            <div class="address-inner">
-                                <a class="add-address J_address_add_btn J_fake_a" href="###" mars_sead="address_new_radio">
-                                    <span class="u-icon icon-address-add"></span>
-                                    <p>添加地址</p>
-                                </a>
+    <div class="mt-box payment-box ">
+        <div class="box-hd">
+            <h2 class="box-hd-title">支付方式</h2>
+            <p class="box-hd-desc">
+                *&nbsp;推荐使用线上支付，更方便快捷
+            </p>
+        </div>
+        @{
+                            var payModel = Model.CheckoutPaymentMethodModel;
+        }
+        @if (payModel.DisplayRewardPoints && payModel.PaymentMethods.Count > 0)
+        {
+            <div class="box-bd">
+                <div class="payment-group clearfix">
+                    <div class="switch-group">
+                        <div class="mt-checkbox clearfix ">
+                            <div class="ui-checkbox">
+                                <input type="checkbox"
+                                   id="useRewardPoints"
+                                   name="useRewardPoints"
+                                   value="@Model.CheckoutPaymentMethodModel.UseRewardPoints">
+                                <i class="icon-checkbox"></i>
                             </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="mt-box payment-box ">
-    <div class="box-hd">
-        <h2 class="box-hd-title">支付方式</h2>
-        <p class="box-hd-desc">
-            *&nbsp;推荐使用线上支付，更方便快捷
-        </p>
-    </div>
-    @{
-        var payModel = Model.CheckoutPaymentMethodModel;
-    }
-    @if (payModel.DisplayRewardPoints && payModel.PaymentMethods.Count > 0)
-    {
-        <div class="box-bd">
-            <div class="payment-group clearfix">
-                <div class="switch-group">
-                    <div class="mt-checkbox ">
-                        <div class="ui-checkbox">
-                            <input type="checkbox"
-                                   id="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)"
-                                   name="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)"
-                                   value="Model.CheckoutPaymentMethodModel.UseRewardPoints">
-                            <i class="icon-checkbox"></i>
+                            <label class="ui-checkbox-label" for="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)">@T("checkout.userewardpointstitle")</label>
                         </div>
-                        <label class="ui-checkbox-label" for="@Html.FieldIdFor(model => model.CheckoutPaymentMethodModel.UseRewardPoints)">@T("checkout.userewardpointstitle")</label>
                     </div>
-                </div>
-                <div class="m-wallet-tips">
-                    <i class="u-icon icon-wallet-tips-arrow"></i>
-                    <div class="wallet-tips-cnt">
-                        <span class="u-highlight">
-                            @T("checkout.rewardpointscount")
-                            <span class="m-price">
-                                <span class="u-price">@payModel.RewardPointsAmount</span>
+                    <div class="m-wallet-tips">
+                        <i class="u-icon icon-wallet-tips-arrow"></i>
+                        <div class="wallet-tips-cnt">
+                            <span class="u-highlight">
+                                @T("checkout.rewardpointscount")
+                                <span class="m-price">
+                                    <span class="u-price">@payModel.RewardPointsAmount</span>
+                                </span>
                             </span>
-                        </span>
-                        @*<span class="vip-payment-enough">（已足额支付）</span>*@
+                            @*<span class="vip-payment-enough">（已足额支付）</span>*@
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
-    @if (payModel.PaymentMethods.Count > 0)
-    {
-        <div class="payment-types">
-            @for (int i = 0; i < payModel.PaymentMethods.Count; i++)
-            {
-                var paymentMethod = payModel.PaymentMethods[i];
-                var paymentMethodName = paymentMethod.Name;
-                if (!String.IsNullOrEmpty(paymentMethod.Fee))
+        }
+        @if (payModel.PaymentMethods.Count > 0)
+        {
+            <div class="payment-types">
+                @for (int i = 0; i < payModel.PaymentMethods.Count; i++)
                 {
-                    paymentMethodName = T("Checkout.SelectPaymentMethod.MethodAndFee", paymentMethodName, paymentMethod.Fee).Text;
-                }
-                <div class="payment-item @(paymentMethod.Selected?"selected":"")">
-                    <div class="mt-radio">
-                        <div class="ui-radio @(paymentMethod.Selected?"checked":"")">
-                            <input type="radio" id="paymentmethod_@(i)" name="paymentmethod" value="@(paymentMethod.PaymentMethodSystemName)" checked="@paymentMethod.Selected">
-                            <label class="icon-radio" for="paymentmethod_@(i)">@paymentMethodName</label>
+                    var paymentMethod = payModel.PaymentMethods[i];
+                    var paymentMethodName = paymentMethod.Name;
+                    if (!String.IsNullOrEmpty(paymentMethod.Fee))
+                    {
+                        paymentMethodName = T("Checkout.SelectPaymentMethod.MethodAndFee", paymentMethodName, paymentMethod.Fee).Text;
+                    }
+                    <div class="payment-item @(paymentMethod.Selected ? "selected" : "")">
+                        <div class="mt-radio">
+                            <div class="ui-radio @(paymentMethod.Selected ? "checked" : "")">
+                                <input type="radio" id="paymentmethod_@(i)" name="paymentmethod" value="@(paymentMethod.PaymentMethodSystemName)" checked="@paymentMethod.Selected">
+                                <label class="icon-radio" for="paymentmethod_@(i)">@paymentMethodName</label>
+                            </div>
+                            @if (!String.IsNullOrEmpty(paymentMethod.LogoUrl))
+                            {
+                                <label for="paymentmethod_@(i)" class="payment-logo">
+                                    <img src="@paymentMethod.LogoUrl" alt="@paymentMethodName" />
+                                </label>
+                            }
+                            <label for="paymentmethod_@(i)" class="ui-radio-label">@paymentMethodName</label>
                         </div>
-                        @if (!String.IsNullOrEmpty(paymentMethod.LogoUrl))
-                        {
-                            <label for="paymentmethod_@(i)" class="payment-logo">
-                                <img src="@paymentMethod.LogoUrl" alt="@paymentMethodName" />
-                            </label>
-                        }
-                        <label for="paymentmethod_@(i)" class="ui-radio-label">@paymentMethodName</label>
                     </div>
-                </div>
 
-            }
-        </div>
-    }
-    else
-    {
-        <div class="message-error">
-            @T("Checkout.NoPaymentMethods")
-        </div>
-    }
-</div>
-
-<!----------支付方式------------>
-<!----------订单详细------------>
-<div class="mt-box  ">
-    <div class="box-hd">
-        <h2 class="box-hd-title">订单详细</h2>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="message-error">
+                @T("Checkout.NoPaymentMethods")
+            </div>
+        }
     </div>
+    <!----------支付方式------------>
+    <!----------订单详细------------>
+    <div class="mt-box  order-info-box ">
+        <div class="box-hd">
+            <h2 class="box-hd-title">订单详细</h2>
+        </div>
 
-    @Html.Action("OrderSummary", "ShoppingCart")
+        @Html.Action("OrderSummary", "ShoppingCart")
 
-</div>
+        <div class="order-ft-placeholder">
+            <div class="order-ft">
+
+                <button type="submit" id="checkconfirm" name="checkconfirm" value="checkconfirm" class="u-btn btn-primary btn-orders-submit">
+                    <span class="btn-text">@T("Checkout.Submit")</span>
+                </button>
+            </div>
+        </div>
+
+
+    </div>
+}
